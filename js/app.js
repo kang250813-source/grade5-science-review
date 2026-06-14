@@ -15,11 +15,9 @@
     quizWrong: [],
     selectedQuizUnits: ['all'],
     chainIndex: 0,
-    matchSelected: null,
-    matchPairs: [],
-    orderSelected: null,
-    timelineFilled: [],
-    chainFilled: []
+    conceptQuestions: [],
+    conceptIndex: 0,
+    conceptScore: 0
   };
 
   function loadProgress() {
@@ -373,239 +371,229 @@
     }
   }
 
-  /* ── Play: 点击排序（通用） ── */
-  function setupOrderGame(slotsId, poolId, items, labels, feedbackId) {
-    const slotsEl = $(slotsId);
-    const poolEl = $(poolId);
-    let filled = items.map(() => null);
+  /* ── Play: 下拉排序（通用） ── */
+  function renderPickRows(containerId, options, labels) {
+    const el = $(containerId);
+    el.innerHTML = labels.map((label, i) => `
+      <div class="pick-row" data-index="${i}">
+        <span class="pick-label">${label}</span>
+        <select class="pick-select" aria-label="${label}">
+          <option value="">— 请选择 —</option>
+          ${options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+        </select>
+      </div>
+    `).join('');
 
-    function getAvailable() {
-      const used = new Set(filled.filter(Boolean));
-      return items.filter(name => !used.has(name));
-    }
-
-    function render() {
-      slotsEl.innerHTML = items.map((_, i) => {
-        const val = filled[i];
-        const cls = ['order-slot', val ? 'filled' : ''].filter(Boolean).join(' ');
-        return `
-          <button type="button" class="${cls}" data-slot="${i}">
-            <span class="order-slot-num">${i + 1}</span>
-            <span class="order-slot-label">${labels[i] || ''}</span>
-            <span class="order-slot-value">${val || '（点击放入）'}</span>
-          </button>`;
-      }).join('');
-
-      const available = getAvailable();
-      poolEl.innerHTML = available.length
-        ? available.map(name =>
-            `<button type="button" class="order-chip${state.orderSelected === name ? ' selected' : ''}" data-name="${name}">${name}</button>`
-          ).join('')
-        : '<span style="color:#94a3b8;font-size:0.85rem;">全部已放入，可以检查答案了</span>';
-
-      slotsEl.querySelectorAll('.order-slot').forEach(slot => {
-        slot.addEventListener('click', () => handleSlotClick(+slot.dataset.slot));
-      });
-      poolEl.querySelectorAll('.order-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          state.orderSelected = chip.dataset.name;
-          render();
-        });
-      });
-    }
-
-    function handleSlotClick(index) {
-      const fb = $(feedbackId);
-      if (fb) { fb.textContent = ''; fb.className = 'play-feedback'; }
-      slotsEl.querySelectorAll('.order-slot').forEach(s => s.classList.remove('correct', 'wrong'));
-
-      if (state.orderSelected) {
-        filled[index] = state.orderSelected;
-        state.orderSelected = null;
-      } else if (filled[index]) {
-        state.orderSelected = filled[index];
-        filled[index] = null;
-      }
-      render();
-    }
-
-    function checkAnswer(correctOrder) {
-      let allCorrect = true;
-      slotsEl.querySelectorAll('.order-slot').forEach((slot, i) => {
-        const ok = filled[i] === correctOrder[i];
-        slot.classList.toggle('correct', ok);
-        slot.classList.toggle('wrong', !ok);
-        if (!ok) allCorrect = false;
-      });
-      return { allCorrect, filled: [...filled] };
-    }
-
-    function reset() {
-      filled = items.map(() => null);
-      state.orderSelected = null;
-      const fb = $(feedbackId);
-      if (fb) { fb.textContent = ''; fb.className = 'play-feedback'; }
-      render();
-    }
-
-    render();
-    return { checkAnswer, reset, getFilled: () => [...filled] };
+    el.querySelectorAll('.pick-select').forEach(sel => {
+      sel.addEventListener('change', () => clearPickFeedback(containerId));
+    });
   }
 
-  let timelineGame = null;
-  let chainGame = null;
+  function clearPickFeedback(containerId) {
+    const fbId = containerId === '#timelineRows' ? '#timelineFeedback' : '#chainFeedback';
+    const fb = $(fbId);
+    if (fb) { fb.textContent = ''; fb.className = 'play-feedback'; }
+    $(containerId).querySelectorAll('.pick-row').forEach(r => r.classList.remove('correct', 'wrong'));
+    $(containerId).querySelectorAll('.pick-select').forEach(s => s.classList.remove('correct', 'wrong'));
+  }
+
+  function resetPickRows(containerId, feedbackId) {
+    $(containerId).querySelectorAll('.pick-select').forEach(s => { s.value = ''; });
+    const fb = $(feedbackId);
+    if (fb) { fb.textContent = ''; fb.className = 'play-feedback'; }
+    $(containerId).querySelectorAll('.pick-row').forEach(r => r.classList.remove('correct', 'wrong'));
+    $(containerId).querySelectorAll('.pick-select').forEach(s => s.classList.remove('correct', 'wrong'));
+  }
+
+  function getPickValues(containerId) {
+    return [...$(containerId).querySelectorAll('.pick-select')].map(s => s.value);
+  }
+
+  function checkPickRows(containerId, correctOrder, feedbackId) {
+    const rows = $(containerId).querySelectorAll('.pick-row');
+    const values = getPickValues(containerId);
+    const fb = $(feedbackId);
+
+    if (values.some(v => !v)) {
+      fb.className = 'play-feedback error';
+      fb.textContent = '还有没选完的行，请每一行都选一个答案。';
+      return false;
+    }
+
+    const dup = values.length !== new Set(values).size;
+    if (dup) {
+      fb.className = 'play-feedback error';
+      fb.textContent = '有重复的选项！每一行应该选不同的答案。';
+      return false;
+    }
+
+    let allCorrect = true;
+    rows.forEach((row, i) => {
+      const sel = row.querySelector('.pick-select');
+      const ok = values[i] === correctOrder[i];
+      row.classList.toggle('correct', ok);
+      row.classList.toggle('wrong', !ok);
+      sel.classList.toggle('correct', ok);
+      sel.classList.toggle('wrong', !ok);
+      if (!ok) allCorrect = false;
+    });
+
+    if (allCorrect) {
+      fb.className = 'play-feedback success';
+      fb.textContent = '🎉 完全正确！太棒了！';
+    } else {
+      fb.className = 'play-feedback error';
+      fb.textContent = '还有些不对，绿色是对的，红色需要改。也可以点「看正确答案」对照学习。';
+    }
+    return allCorrect;
+  }
+
+  function showPickAnswer(containerId, correctOrder, feedbackId) {
+    const rows = $(containerId).querySelectorAll('.pick-row');
+    rows.forEach((row, i) => {
+      const sel = row.querySelector('.pick-select');
+      sel.value = correctOrder[i];
+      row.classList.add('correct');
+      sel.classList.add('correct');
+      row.classList.remove('wrong');
+      sel.classList.remove('wrong');
+    });
+    const fb = $(feedbackId);
+    fb.className = 'play-feedback info';
+    fb.textContent = '📖 正确答案：' + correctOrder.join(' → ');
+  }
 
   /* ── Play: Timeline ── */
   function initTimeline() {
-    const labels = ['最早', '↓', '↓', '↓', '↓', '最新'];
-    timelineGame = setupOrderGame('#timelineSlots', '#timelinePool', SHIP_TIMELINE, labels, '#timelineFeedback');
-    $('#checkTimeline').addEventListener('click', () => {
-      const { allCorrect } = timelineGame.checkAnswer(SHIP_TIMELINE);
-      const fb = $('#timelineFeedback');
-      if (allCorrect) {
-        fb.className = 'play-feedback success';
-        fb.textContent = '🎉 完全正确！独木舟 → 摇橹木船 → 帆船 → 蒸汽船 → 轮船 → 潜艇';
-      } else {
-        const filled = timelineGame.getFilled();
-        if (filled.some(v => !v)) {
-          fb.className = 'play-feedback error';
-          fb.textContent = '还有空格没填完，请把所有选项都放入对应位置。';
-        } else {
-          fb.className = 'play-feedback error';
-          fb.textContent = '顺序还不对，绿色是对的，红色需要调整。可以点红色格子撤回后重新放入。';
-        }
-      }
-    });
-    $('#resetTimeline').addEventListener('click', () => timelineGame.reset());
+    const labels = ['第1（最早）', '第2', '第3', '第4', '第5', '第6（最新）'];
+    renderPickRows('#timelineRows', SHIP_TIMELINE, labels);
+    $('#checkTimeline').addEventListener('click', () => checkPickRows('#timelineRows', SHIP_TIMELINE, '#timelineFeedback'));
+    $('#resetTimeline').addEventListener('click', () => resetPickRows('#timelineRows', '#timelineFeedback'));
+    $('#showTimelineAnswer').addEventListener('click', () => showPickAnswer('#timelineRows', SHIP_TIMELINE, '#timelineFeedback'));
   }
 
   /* ── Play: Food Chain ── */
   function initFoodChain() {
     state.chainIndex = 0;
     renderFoodChain();
-    $('#checkChain').addEventListener('click', checkFoodChain);
+    $('#checkChain').addEventListener('click', () => {
+      const chain = FOOD_CHAINS[state.chainIndex];
+      checkPickRows('#chainRows', chain.items, '#chainFeedback');
+    });
     $('#nextChain').addEventListener('click', () => {
       state.chainIndex = (state.chainIndex + 1) % FOOD_CHAINS.length;
       renderFoodChain();
+    });
+    $('#showChainAnswer').addEventListener('click', () => {
+      const chain = FOOD_CHAINS[state.chainIndex];
+      showPickAnswer('#chainRows', chain.items, '#chainFeedback');
     });
   }
 
   function renderFoodChain() {
     const chain = FOOD_CHAINS[state.chainIndex];
-    $('#chainScenario').textContent = `📋 ${chain.name}`;
-    const labels = ['生产者', '初级消费者', '次级消费者', '顶级消费者'];
-    chainGame = setupOrderGame('#chainSlots', '#chainPool', chain.items, labels.slice(0, chain.items.length), '#chainFeedback');
+    $('#chainScenario').innerHTML = `📋 <strong>${chain.name}</strong>：从生产者到顶级消费者，每一行选一种生物`;
+    const labels = ['🌱 生产者', '🐛 初级消费者', '🐸 次级消费者', '🦅 顶级消费者'];
+    renderPickRows('#chainRows', chain.items, labels.slice(0, chain.items.length));
+    resetPickRows('#chainRows', '#chainFeedback');
   }
 
-  function checkFoodChain() {
-    const chain = FOOD_CHAINS[state.chainIndex];
-    const { allCorrect } = chainGame.checkAnswer(chain.items);
-    const fb = $('#chainFeedback');
-    if (allCorrect) {
-      fb.className = 'play-feedback success';
-      fb.textContent = '🎉 正确！' + chain.items.join(' → ');
-    } else {
-      const filled = chainGame.getFilled();
-      if (filled.some(v => !v)) {
-        fb.className = 'play-feedback error';
-        fb.textContent = '还有空格没填完，从生产者（植物）开始依次放入。';
-      } else {
-        fb.className = 'play-feedback error';
-        fb.textContent = '顺序还不对，提示：从生产者（植物）开始，到顶级消费者结束。';
-      }
-    }
-  }
-
-  /* ── Play: Match ── */
-  function initMatch() {
-    resetMatch();
-    $('#resetMatch').addEventListener('click', resetMatch);
-  }
-
-  function updateMatchProgress() {
-    const total = state.matchPairs.length;
-    const done = $$('.match-item.matched[data-side="term"]').length;
-    $('#matchProgress').textContent = `${done} / ${total}`;
-  }
-
-  function resetMatch() {
-    state.matchSelected = null;
-    state.matchPairs = shuffle(MATCH_PAIRS);
-    const terms = $('#matchTerms');
-    const defs = $('#matchDefs');
-    $('#matchFeedback').textContent = '';
-    $('#matchFeedback').className = 'play-feedback';
-
-    const shuffledDefs = shuffle(state.matchPairs.map(p => p.def));
-    terms.innerHTML = state.matchPairs.map((p, i) =>
-      `<div class="match-item" data-side="term" data-idx="${i}">${p.term}</div>`
-    ).join('');
-    defs.innerHTML = shuffledDefs.map(d =>
-      `<div class="match-item" data-side="def" data-def="${d}">${d}</div>`
-    ).join('');
-
-    $$('#matchTerms .match-item, #matchDefs .match-item').forEach(item => {
-      item.addEventListener('click', () => handleMatchClick(item));
+  /* ── Play: 概念闯关（选择题） ── */
+  function buildConceptQuestions() {
+    return MATCH_PAIRS.map(p => {
+      const wrong = shuffle(MATCH_PAIRS.filter(x => x.term !== p.term).map(x => x.def)).slice(0, 3);
+      const options = shuffle([p.def, ...wrong]);
+      return {
+        term: p.term,
+        q: `「${p.term}」的意思是？`,
+        options,
+        answer: options.indexOf(p.def),
+        explain: p.def
+      };
     });
-    updateMatchProgress();
   }
 
-  function handleMatchClick(item) {
-    if (item.classList.contains('matched')) return;
+  function initConceptQuiz() {
+    $('#resetConcept').addEventListener('click', startConceptQuiz);
+    $('#conceptNext').addEventListener('click', nextConceptQuestion);
+    startConceptQuiz();
+  }
 
-    if (!state.matchSelected) {
-      state.matchSelected = item;
-      item.classList.add('selected');
-      return;
-    }
+  function startConceptQuiz() {
+    state.conceptQuestions = shuffle(buildConceptQuestions());
+    state.conceptIndex = 0;
+    state.conceptScore = 0;
+    $('#conceptNext').classList.add('hidden');
+    renderConceptQuestion();
+  }
 
-    if (state.matchSelected === item) {
-      item.classList.remove('selected');
-      state.matchSelected = null;
-      return;
-    }
+  function renderConceptQuestion() {
+    const total = state.conceptQuestions.length;
+    const q = state.conceptQuestions[state.conceptIndex];
+    $('#conceptProgress').textContent = `${state.conceptIndex + 1} / ${total}`;
+    $('#conceptQuestion').textContent = q.q;
+    $('#conceptFeedback').textContent = '';
+    $('#conceptFeedback').className = 'play-feedback';
+    $('#conceptNext').classList.add('hidden');
 
-    if (state.matchSelected.dataset.side === item.dataset.side) {
-      state.matchSelected.classList.remove('selected');
-      state.matchSelected = item;
-      item.classList.add('selected');
-      return;
-    }
+    const opts = $('#conceptOptions');
+    opts.innerHTML = q.options.map((opt, i) =>
+      `<button type="button" class="mini-opt" data-idx="${i}">${String.fromCharCode(65 + i)}. ${opt}</button>`
+    ).join('');
 
-    const termEl = state.matchSelected.dataset.side === 'term' ? state.matchSelected : item;
-    const defEl = state.matchSelected.dataset.side === 'def' ? state.matchSelected : item;
-    const pair = state.matchPairs[+termEl.dataset.idx];
-    const correct = pair.def === defEl.dataset.def;
+    opts.querySelectorAll('.mini-opt').forEach(btn => {
+      btn.addEventListener('click', () => answerConcept(+btn.dataset.idx));
+    });
+  }
 
-    if (correct) {
-      termEl.classList.remove('selected');
-      termEl.classList.add('matched');
-      defEl.classList.add('matched');
-      state.matchSelected = null;
-      updateMatchProgress();
+  function answerConcept(selected) {
+    const q = state.conceptQuestions[state.conceptIndex];
+    const buttons = $$('#conceptOptions .mini-opt');
 
-      if ($$('.match-item:not(.matched)').length === 0) {
-        $('#matchFeedback').className = 'play-feedback success';
-        $('#matchFeedback').textContent = '🎉 全部配对正确！概念掌握得很棒！';
-      }
+    buttons.forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.answer) btn.classList.add('correct');
+      else if (i === selected) btn.classList.add('wrong');
+    });
+
+    const fb = $('#conceptFeedback');
+    if (selected === q.answer) {
+      state.conceptScore++;
+      fb.className = 'play-feedback success';
+      fb.textContent = '✓ 回答正确！';
     } else {
-      termEl.classList.add('wrong-flash');
-      defEl.classList.add('wrong-flash');
-      state.matchSelected.classList.remove('selected');
-      setTimeout(() => {
-        termEl.classList.remove('wrong-flash', 'selected');
-        defEl.classList.remove('wrong-flash', 'selected');
-      }, 600);
-      state.matchSelected = null;
-      $('#matchFeedback').className = 'play-feedback error';
-      $('#matchFeedback').textContent = '配对不对，再试一次！';
-      setTimeout(() => {
-        if ($('#matchFeedback').textContent === '配对不对，再试一次！') {
-          $('#matchFeedback').textContent = '';
-          $('#matchFeedback').className = 'play-feedback';
-        }
-      }, 1500);
+      fb.className = 'play-feedback error';
+      fb.textContent = `✗ 正确答案是：${q.explain}`;
     }
+
+    const isLast = state.conceptIndex + 1 >= state.conceptQuestions.length;
+    $('#conceptNext').classList.remove('hidden');
+    $('#conceptNext').textContent = isLast ? '查看成绩' : '下一题 →';
+  }
+
+  function nextConceptQuestion() {
+    state.conceptIndex++;
+    if (state.conceptIndex >= state.conceptQuestions.length) {
+      showConceptResult();
+    } else {
+      renderConceptQuestion();
+    }
+  }
+
+  function showConceptResult() {
+    const total = state.conceptQuestions.length;
+    const score = state.conceptScore;
+    $('#conceptProgress').textContent = '完成';
+    $('#conceptQuestion').textContent = '闯关结束！';
+    $('#conceptOptions').innerHTML = '';
+    const pct = Math.round((score / total) * 100);
+    let msg = `得分：${score} / ${total}`;
+    if (pct >= 90) msg += ' 🏆 概念掌握得非常棒！';
+    else if (pct >= 70) msg += ' 🎉 不错，再看看错题就更好了！';
+    else msg += ' 💪 建议回到「知识点」和「闪卡」再复习一下。';
+    $('#conceptFeedback').className = 'play-feedback ' + (pct >= 70 ? 'success' : 'info');
+    $('#conceptFeedback').textContent = msg;
+    $('#conceptNext').classList.add('hidden');
   }
 
   /* ── Play tabs ── */
@@ -637,7 +625,7 @@
     initQuizSetup();
     initTimeline();
     initFoodChain();
-    initMatch();
+    initConceptQuiz();
     initPlayTabs();
     renderHome();
     renderTopics();
