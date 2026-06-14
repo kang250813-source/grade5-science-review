@@ -16,7 +16,10 @@
     selectedQuizUnits: ['all'],
     chainIndex: 0,
     matchSelected: null,
-    matchPairs: []
+    matchPairs: [],
+    orderSelected: null,
+    timelineFilled: [],
+    chainFilled: []
   };
 
   function loadProgress() {
@@ -370,49 +373,110 @@
     }
   }
 
+  /* ── Play: 点击排序（通用） ── */
+  function setupOrderGame(slotsId, poolId, items, labels, feedbackId) {
+    const slotsEl = $(slotsId);
+    const poolEl = $(poolId);
+    let filled = items.map(() => null);
+
+    function getAvailable() {
+      const used = new Set(filled.filter(Boolean));
+      return items.filter(name => !used.has(name));
+    }
+
+    function render() {
+      slotsEl.innerHTML = items.map((_, i) => {
+        const val = filled[i];
+        const cls = ['order-slot', val ? 'filled' : ''].filter(Boolean).join(' ');
+        return `
+          <button type="button" class="${cls}" data-slot="${i}">
+            <span class="order-slot-num">${i + 1}</span>
+            <span class="order-slot-label">${labels[i] || ''}</span>
+            <span class="order-slot-value">${val || '（点击放入）'}</span>
+          </button>`;
+      }).join('');
+
+      const available = getAvailable();
+      poolEl.innerHTML = available.length
+        ? available.map(name =>
+            `<button type="button" class="order-chip${state.orderSelected === name ? ' selected' : ''}" data-name="${name}">${name}</button>`
+          ).join('')
+        : '<span style="color:#94a3b8;font-size:0.85rem;">全部已放入，可以检查答案了</span>';
+
+      slotsEl.querySelectorAll('.order-slot').forEach(slot => {
+        slot.addEventListener('click', () => handleSlotClick(+slot.dataset.slot));
+      });
+      poolEl.querySelectorAll('.order-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          state.orderSelected = chip.dataset.name;
+          render();
+        });
+      });
+    }
+
+    function handleSlotClick(index) {
+      const fb = $(feedbackId);
+      if (fb) { fb.textContent = ''; fb.className = 'play-feedback'; }
+      slotsEl.querySelectorAll('.order-slot').forEach(s => s.classList.remove('correct', 'wrong'));
+
+      if (state.orderSelected) {
+        filled[index] = state.orderSelected;
+        state.orderSelected = null;
+      } else if (filled[index]) {
+        state.orderSelected = filled[index];
+        filled[index] = null;
+      }
+      render();
+    }
+
+    function checkAnswer(correctOrder) {
+      let allCorrect = true;
+      slotsEl.querySelectorAll('.order-slot').forEach((slot, i) => {
+        const ok = filled[i] === correctOrder[i];
+        slot.classList.toggle('correct', ok);
+        slot.classList.toggle('wrong', !ok);
+        if (!ok) allCorrect = false;
+      });
+      return { allCorrect, filled: [...filled] };
+    }
+
+    function reset() {
+      filled = items.map(() => null);
+      state.orderSelected = null;
+      const fb = $(feedbackId);
+      if (fb) { fb.textContent = ''; fb.className = 'play-feedback'; }
+      render();
+    }
+
+    render();
+    return { checkAnswer, reset, getFilled: () => [...filled] };
+  }
+
+  let timelineGame = null;
+  let chainGame = null;
+
   /* ── Play: Timeline ── */
   function initTimeline() {
-    resetTimeline();
-    $('#checkTimeline').addEventListener('click', checkTimeline);
-    $('#resetTimeline').addEventListener('click', resetTimeline);
-  }
-
-  function resetTimeline() {
-    const shuffled = shuffle(SHIP_TIMELINE);
-    const slots = $('#timelineSlots');
-    const pool = $('#timelinePool');
-    $('#timelineFeedback').textContent = '';
-    $('#timelineFeedback').className = 'play-feedback';
-
-    slots.innerHTML = SHIP_TIMELINE.map((_, i) =>
-      `<span class="slot-num">${i + 1}</span>`
-    ).join('');
-
-    pool.innerHTML = shuffled.map((name, i) =>
-      `<div class="drag-item" draggable="true" data-name="${name}" data-idx="${i}">${name}</div>`
-    ).join('');
-
-    setupDragDrop(slots, pool);
-  }
-
-  function checkTimeline() {
-    const slots = $('#timelineSlots');
-    const items = [...slots.querySelectorAll('.drag-item')];
-    let allCorrect = items.length === SHIP_TIMELINE.length;
-    items.forEach((item, i) => {
-      const correct = item.dataset.name === SHIP_TIMELINE[i];
-      item.classList.toggle('correct-item', correct);
-      item.classList.toggle('wrong-item', !correct);
-      if (!correct) allCorrect = false;
+    const labels = ['最早', '↓', '↓', '↓', '↓', '最新'];
+    timelineGame = setupOrderGame('#timelineSlots', '#timelinePool', SHIP_TIMELINE, labels, '#timelineFeedback');
+    $('#checkTimeline').addEventListener('click', () => {
+      const { allCorrect } = timelineGame.checkAnswer(SHIP_TIMELINE);
+      const fb = $('#timelineFeedback');
+      if (allCorrect) {
+        fb.className = 'play-feedback success';
+        fb.textContent = '🎉 完全正确！独木舟 → 摇橹木船 → 帆船 → 蒸汽船 → 轮船 → 潜艇';
+      } else {
+        const filled = timelineGame.getFilled();
+        if (filled.some(v => !v)) {
+          fb.className = 'play-feedback error';
+          fb.textContent = '还有空格没填完，请把所有选项都放入对应位置。';
+        } else {
+          fb.className = 'play-feedback error';
+          fb.textContent = '顺序还不对，绿色是对的，红色需要调整。可以点红色格子撤回后重新放入。';
+        }
+      }
     });
-    const fb = $('#timelineFeedback');
-    if (allCorrect) {
-      fb.className = 'play-feedback success';
-      fb.textContent = '🎉 完全正确！你记住了船的发展顺序。';
-    } else {
-      fb.className = 'play-feedback error';
-      fb.textContent = '还有些位置不对，绿色是正确的，红色需要调整。点击「重置」再试一次。';
-    }
+    $('#resetTimeline').addEventListener('click', () => timelineGame.reset());
   }
 
   /* ── Play: Food Chain ── */
@@ -429,42 +493,26 @@
   function renderFoodChain() {
     const chain = FOOD_CHAINS[state.chainIndex];
     $('#chainScenario').textContent = `📋 ${chain.name}`;
-    const shuffled = shuffle(chain.items);
-    const slots = $('#chainSlots');
-    const pool = $('#chainPool');
-    $('#chainFeedback').textContent = '';
-    $('#chainFeedback').className = 'play-feedback';
-
-    slots.innerHTML = chain.items.map((_, i) => {
-      const labels = ['生产者', '初级消费者', '次级消费者', '顶级消费者'];
-      return `<span class="slot-num" title="${labels[i] || ''}">${i + 1}</span>`;
-    }).join('');
-
-    pool.innerHTML = shuffled.map(name =>
-      `<div class="drag-item" draggable="true" data-name="${name}">${name}</div>`
-    ).join('');
-
-    setupDragDrop(slots, pool);
+    const labels = ['生产者', '初级消费者', '次级消费者', '顶级消费者'];
+    chainGame = setupOrderGame('#chainSlots', '#chainPool', chain.items, labels.slice(0, chain.items.length), '#chainFeedback');
   }
 
   function checkFoodChain() {
     const chain = FOOD_CHAINS[state.chainIndex];
-    const slots = $('#chainSlots');
-    const items = [...slots.querySelectorAll('.drag-item')];
-    let allCorrect = items.length === chain.items.length;
-    items.forEach((item, i) => {
-      const correct = item.dataset.name === chain.items[i];
-      item.classList.toggle('correct-item', correct);
-      item.classList.toggle('wrong-item', !correct);
-      if (!correct) allCorrect = false;
-    });
+    const { allCorrect } = chainGame.checkAnswer(chain.items);
     const fb = $('#chainFeedback');
     if (allCorrect) {
       fb.className = 'play-feedback success';
       fb.textContent = '🎉 正确！' + chain.items.join(' → ');
     } else {
-      fb.className = 'play-feedback error';
-      fb.textContent = '顺序还不对，提示：从生产者（植物）开始，到顶级消费者结束。';
+      const filled = chainGame.getFilled();
+      if (filled.some(v => !v)) {
+        fb.className = 'play-feedback error';
+        fb.textContent = '还有空格没填完，从生产者（植物）开始依次放入。';
+      } else {
+        fb.className = 'play-feedback error';
+        fb.textContent = '顺序还不对，提示：从生产者（植物）开始，到顶级消费者结束。';
+      }
     }
   }
 
@@ -472,6 +520,12 @@
   function initMatch() {
     resetMatch();
     $('#resetMatch').addEventListener('click', resetMatch);
+  }
+
+  function updateMatchProgress() {
+    const total = state.matchPairs.length;
+    const done = $$('.match-item.matched[data-side="term"]').length;
+    $('#matchProgress').textContent = `${done} / ${total}`;
   }
 
   function resetMatch() {
@@ -486,13 +540,14 @@
     terms.innerHTML = state.matchPairs.map((p, i) =>
       `<div class="match-item" data-side="term" data-idx="${i}">${p.term}</div>`
     ).join('');
-    defs.innerHTML = shuffledDefs.map((d, i) =>
+    defs.innerHTML = shuffledDefs.map(d =>
       `<div class="match-item" data-side="def" data-def="${d}">${d}</div>`
     ).join('');
 
-    $$('.match-item').forEach(item => {
+    $$('#matchTerms .match-item, #matchDefs .match-item').forEach(item => {
       item.addEventListener('click', () => handleMatchClick(item));
     });
+    updateMatchProgress();
   }
 
   function handleMatchClick(item) {
@@ -527,74 +582,30 @@
       termEl.classList.add('matched');
       defEl.classList.add('matched');
       state.matchSelected = null;
+      updateMatchProgress();
 
-      const remaining = $$('.match-item:not(.matched)').length;
-      if (remaining === 0) {
+      if ($$('.match-item:not(.matched)').length === 0) {
         $('#matchFeedback').className = 'play-feedback success';
         $('#matchFeedback').textContent = '🎉 全部配对正确！概念掌握得很棒！';
       }
     } else {
       termEl.classList.add('wrong-flash');
       defEl.classList.add('wrong-flash');
+      state.matchSelected.classList.remove('selected');
       setTimeout(() => {
         termEl.classList.remove('wrong-flash', 'selected');
         defEl.classList.remove('wrong-flash', 'selected');
-      }, 500);
+      }, 600);
       state.matchSelected = null;
+      $('#matchFeedback').className = 'play-feedback error';
+      $('#matchFeedback').textContent = '配对不对，再试一次！';
+      setTimeout(() => {
+        if ($('#matchFeedback').textContent === '配对不对，再试一次！') {
+          $('#matchFeedback').textContent = '';
+          $('#matchFeedback').className = 'play-feedback';
+        }
+      }, 1500);
     }
-  }
-
-  /* ── Drag & Drop ── */
-  function setupDragDrop(slotsContainer, poolContainer) {
-    let dragged = null;
-
-    function onDragStart(e) {
-      dragged = e.target;
-      e.dataTransfer.effectAllowed = 'move';
-      setTimeout(() => dragged.style.opacity = '0.5', 0);
-    }
-
-    function onDragEnd() {
-      if (dragged) dragged.style.opacity = '1';
-      dragged = null;
-    }
-
-    function onDragOver(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-    }
-
-    function onDropSlot(e) {
-      e.preventDefault();
-      if (!dragged) return;
-      const target = e.target.closest('.timeline-slots, .chain-slots') ? e.target : null;
-      if (target && (target.classList.contains('drag-item') || target.classList.contains('slot-num') || target === slotsContainer)) {
-        slotsContainer.appendChild(dragged);
-        dragged.classList.add('placed');
-      }
-    }
-
-    function onDropPool(e) {
-      e.preventDefault();
-      if (!dragged) return;
-      poolContainer.appendChild(dragged);
-      dragged.classList.remove('placed');
-    }
-
-    [poolContainer, slotsContainer].forEach(container => {
-      container.addEventListener('dragover', onDragOver);
-    });
-
-    slotsContainer.addEventListener('drop', onDropSlot);
-    poolContainer.addEventListener('drop', onDropPool);
-
-    poolContainer.querySelectorAll('.drag-item').forEach(item => {
-      item.addEventListener('dragstart', onDragStart);
-      item.addEventListener('dragend', onDragEnd);
-    });
-
-    slotsContainer.addEventListener('dragstart', onDragStart);
-    slotsContainer.addEventListener('dragend', onDragEnd);
   }
 
   /* ── Play tabs ── */

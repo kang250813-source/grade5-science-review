@@ -122,36 +122,54 @@
         </div>
 
         <div class="play-panel active" id="play-timeline">
-          <p class="play-desc">把船的类型按历史发展顺序排列（从最早到最新）</p>
-          <div class="timeline-slots" id="timelineSlots"></div>
-          <div class="timeline-pool" id="timelinePool"></div>
+          <div class="play-guide">
+            <strong>怎么玩？</strong> ① 点击下方船的类型选中 ② 再点击上方对应顺序的空格 ③ 点「检查答案」
+            <span class="play-tip">提示：点击已填入的空格可以撤回</span>
+          </div>
+          <p class="play-desc">把船的类型按历史发展顺序排列（从最早 → 最新）</p>
+          <div class="order-slots" id="timelineSlots"></div>
+          <div class="order-pool-label">可选选项（点击选中）</div>
+          <div class="order-pool" id="timelinePool"></div>
           <div class="play-actions">
-            <button class="btn btn-primary" id="checkTimeline">检查答案</button>
-            <button class="btn btn-secondary" id="resetTimeline">重置</button>
+            <button class="btn btn-primary" id="checkTimeline">✓ 检查答案</button>
+            <button class="btn btn-secondary" id="resetTimeline">↺ 重新开始</button>
           </div>
           <div class="play-feedback" id="timelineFeedback"></div>
         </div>
 
         <div class="play-panel" id="play-foodchain">
-          <p class="play-desc">把下面的生物按食物链顺序排列（从生产者到顶级消费者）</p>
+          <div class="play-guide">
+            <strong>怎么玩？</strong> ① 点击下方生物名选中 ② 再点击上方对应位置的空格 ③ 点「检查答案」
+            <span class="play-tip">提示：从生产者（植物）开始排列</span>
+          </div>
           <div class="chain-scenario" id="chainScenario"></div>
-          <div class="chain-slots" id="chainSlots"></div>
-          <div class="chain-pool" id="chainPool"></div>
+          <div class="order-slots" id="chainSlots"></div>
+          <div class="order-pool-label">可选生物（点击选中）</div>
+          <div class="order-pool" id="chainPool"></div>
           <div class="play-actions">
-            <button class="btn btn-primary" id="checkChain">检查答案</button>
-            <button class="btn btn-secondary" id="nextChain">换一题</button>
+            <button class="btn btn-primary" id="checkChain">✓ 检查答案</button>
+            <button class="btn btn-secondary" id="nextChain">↻ 换一题</button>
           </div>
           <div class="play-feedback" id="chainFeedback"></div>
         </div>
 
         <div class="play-panel" id="play-match">
-          <p class="play-desc">点击左侧概念，再点击右侧对应的解释进行配对</p>
+          <div class="play-guide">
+            <strong>怎么玩？</strong> 先点左边概念，再点右边对应的解释。配对成功会变绿。
+          </div>
+          <p class="play-desc">概念配对 <span class="match-progress" id="matchProgress">0 / 8</span></p>
           <div class="match-grid">
-            <div class="match-col" id="matchTerms"></div>
-            <div class="match-col" id="matchDefs"></div>
+            <div class="match-col">
+              <div class="match-col-title">📌 概念</div>
+              <div id="matchTerms"></div>
+            </div>
+            <div class="match-col">
+              <div class="match-col-title">📖 解释</div>
+              <div id="matchDefs"></div>
+            </div>
           </div>
           <div class="play-actions">
-            <button class="btn btn-secondary" id="resetMatch">重新开始</button>
+            <button class="btn btn-secondary" id="resetMatch">↺ 重新开始</button>
           </div>
           <div class="play-feedback" id="matchFeedback"></div>
         </div>
