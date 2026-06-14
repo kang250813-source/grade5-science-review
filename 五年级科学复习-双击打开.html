@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>五年级下册科学 · 互动复习</title>
+  <style>
+:root {
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --text: #1a2332;
+  --text-muted: #5a6a7e;
+  --primary: #2563eb;
+  --primary-light: #dbeafe;
+  --primary-dark: #1d4ed8;
+  --success: #059669;
+  --success-light: #d1fae5;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --unit1: #10b981;
+  --unit2: #3b82f6;
+  --unit3: #8b5cf6;
+  --unit4: #f59e0b;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --font: system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%);
+  color: white;
+  padding: 1rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-lg);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+.logo-icon { font-size: 2rem; }
+.logo h1 { font-size: 1.25rem; font-weight: 900; line-height: 1.2; }
+.logo p { font-size: 0.75rem; opacity: 0.85; }
+
+.nav { display: flex; flex-wrap: wrap; gap: 0.35rem; flex: 1; justify-content: center; }
+
+.nav-btn {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover { background: rgba(255,255,255,0.28); }
+.nav-btn.active { background: white; color: var(--primary); font-weight: 700; }
+
+.progress-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.progress-label { white-space: nowrap; }
+.progress-bar {
+  width: 80px;
+  height: 8px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #fbbf24;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.progress-text { font-weight: 700; min-width: 2.5rem; }
+
+/* Main */
+.main {
+  flex: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.view { display: none; animation: fadeIn 0.3s ease; }
+.view.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hidden { display: none !important; }
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 2rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.hero h2 {
+  font-size: 1.75rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #1e40af, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p { color: var(--text-muted); max-width: 540px; margin: 0 auto; }
+
+/* Unit cards */
+.unit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.unit-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-top: 4px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.unit-card::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  opacity: 0.08;
+  background: currentColor;
+}
+
+.unit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.unit-card .unit-num { font-size: 2.5rem; font-weight: 900; opacity: 0.15; line-height: 1; }
+.unit-card h3 { font-size: 1.1rem; font-weight: 700; margin: 0.25rem 0; }
+.unit-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
+.unit-card .unit-topics { font-size: 0.8rem; color: var(--text-muted); }
+.unit-card .unit-progress {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.unit-card[data-unit="0"] { border-color: var(--unit1); color: var(--unit1); }
+.unit-card[data-unit="1"] { border-color: var(--unit2); color: var(--unit2); }
+.unit-card[data-unit="2"] { border-color: var(--unit3); color: var(--unit3); }
+.unit-card[data-unit="3"] { border-color: var(--unit4); color: var(--unit4); }
+
+/* Stats */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.stat-card .stat-num {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.stat-card .stat-label { font-size: 0.85rem; color: var(--text-muted); }
+
+/* Toolbar */
+.view-toolbar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.select, .search {
+  font-family: var(--font);
+  padding: 0.6rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  background: var(--surface);
+  transition: border-color 0.2s;
+}
+
+.select:focus, .search:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.search { flex: 1; min-width: 180px; }
+
+/* Topic list */
+.topic-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.topic-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.topic-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.topic-header:hover { background: #f8fafc; }
+
+.topic-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.topic-header .topic-badge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.topic-header .chevron {
+  transition: transform 0.3s;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.topic-card.open .chevron { transform: rotate(180deg); }
+
+.topic-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+.topic-card.open .topic-body { max-height: 2000px; }
+
+.topic-content { padding: 0 1.25rem 1.25rem; }
+
+.point-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+
+.point-list li {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  padding: 0.6rem 0.8rem;
+  background: #f8fafc;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--primary);
+}
+
+.point-list li::before {
+  content: '💡';
+  flex-shrink: 0;
+}
+
+.topic-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.btn-done {
+  font-family: var(--font);
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 2px solid var(--success);
+  background: transparent;
+  color: var(--success);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-done:hover { background: var(--success-light); }
+.btn-done.completed { background: var(--success); color: white; }
+
+/* Flashcard */
+.flash-counter { font-weight: 700; color: var(--text-muted); margin-left: auto; }
+
+.flashcard-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.flashcard {
+  width: 100%;
+  max-width: 520px;
+  height: 280px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.flashcard-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+
+.flashcard-front, .flashcard-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.flashcard-front {
+  background: linear-gradient(145deg, #1e40af, #3b82f6);
+  color: white;
+}
+
+.flashcard-back {
+  background: var(--surface);
+  transform: rotateY(180deg);
+  border: 3px solid var(--primary);
+}
+
+.flash-tag {
+  font-size: 0.75rem;
+  background: rgba(255,255,255,0.2);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.flashcard-front h3 { font-size: 1.2rem; font-weight: 700; line-height: 1.5; }
+.flash-hint { font-size: 0.8rem; opacity: 0.7; margin-top: 1.5rem; }
+.flashcard-back p { font-size: 1rem; line-height: 1.7; color: var(--text); }
+
+.flash-controls { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
+
+/* Buttons */
+.btn {
+  font-family: var(--font);
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary { background: #e2e8f0; color: var(--text); }
+.btn-secondary:hover { background: #cbd5e1; }
+.btn-lg { padding: 0.85rem 2rem; font-size: 1rem; }
+
+/* Quiz */
+.quiz-setup { text-align: center; padding: 2rem 1rem; }
+.quiz-setup h2 { margin-bottom: 1.5rem; font-size: 1.5rem; }
+
+.quiz-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.quiz-opt {
+  padding: 0.75rem 1.25rem;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.quiz-opt.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); font-weight: 700; }
+
+.quiz-active { max-width: 640px; margin: 0 auto; }
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.quiz-question {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow);
+  line-height: 1.6;
+}
+
+.quiz-choices { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem; }
+
+.quiz-choice {
+  padding: 0.85rem 1.1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.95rem;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.quiz-choice:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-light); }
+.quiz-choice.correct { border-color: var(--success); background: var(--success-light); }
+.quiz-choice.wrong { border-color: var(--danger); background: var(--danger-light); }
+.quiz-choice:disabled { cursor: default; }
+
+.quiz-feedback {
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.quiz-feedback.correct-fb { background: var(--success-light); color: var(--success); }
+.quiz-feedback.wrong-fb { background: var(--danger-light); color: var(--danger); }
+
+.quiz-result { display: flex; justify-content: center; padding: 2rem; }
+
+.result-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  max-width: 400px;
+  width: 100%;
+}
+
+.result-emoji { font-size: 4rem; margin-bottom: 0.5rem; }
+.result-score { font-size: 2.5rem; font-weight: 900; color: var(--primary); margin: 0.5rem 0; }
+.result-actions { display: flex; gap: 0.75rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
+
+/* Play */
+.play-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.play-tab {
+  font-family: var(--font);
+  padding: 0.6rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.play-tab.active { border-color: var(--primary); background: var(--primary-light); font-weight: 700; }
+
+.play-panel { display: none; }
+.play-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+.play-desc { color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.9rem; }
+
+.timeline-slots, .chain-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  min-height: 60px;
+  padding: 0.75rem;
+  background: #e2e8f0;
+  border-radius: var(--radius-sm);
+  border: 2px dashed #94a3b8;
+}
+
+.timeline-pool, .chain-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.drag-item {
+  padding: 0.5rem 0.85rem;
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  font-size: 0.85rem;
+  font-weight: 600;
+  user-select: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.drag-item:active { cursor: grabbing; transform: scale(1.05); box-shadow: var(--shadow); }
+.drag-item.placed { border-color: #94a3b8; }
+.drag-item.correct-item { border-color: var(--success); background: var(--success-light); }
+.drag-item.wrong-item { border-color: var(--danger); background: var(--danger-light); }
+
+.slot-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  background: #94a3b8;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.chain-scenario {
+  background: var(--primary-light);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--primary-dark);
+}
+
+.play-actions { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+
+.play-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-height: 2.5rem;
+}
+
+.play-feedback.success { background: var(--success-light); color: var(--success); }
+.play-feedback.error { background: var(--danger-light); color: var(--danger); }
+
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  .match-grid { grid-template-columns: 1fr; }
+}
+
+.match-col { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.match-item {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+
+.match-item:hover { border-color: var(--primary); }
+.match-item.selected { border-color: var(--primary); background: var(--primary-light); font-weight: 600; }
+.match-item.matched { border-color: var(--success); background: var(--success-light); cursor: default; opacity: 0.7; }
+.match-item.wrong-flash { animation: shake 0.4s; border-color: var(--danger); }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  .header-inner { flex-direction: column; align-items: stretch; }
+  .nav { justify-content: flex-start; }
+  .progress-badge { justify-content: center; }
+  .hero h2 { font-size: 1.4rem; }
+}
+
+</style>
+  
+  
+  
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-icon">🔬</span>
+          <div>
+            <h1>五年级下册科学</h1>
+            <p>教科版 · 互动复习课件</p>
+          </div>
+        </div>
+        <nav class="nav" id="mainNav">
+          <button class="nav-btn active" data-view="home">首页</button>
+          <button class="nav-btn" data-view="learn">知识点</button>
+          <button class="nav-btn" data-view="flashcard">闪卡</button>
+          <button class="nav-btn" data-view="quiz">测验</button>
+          <button class="nav-btn" data-view="play">趣味互动</button>
+        </nav>
+        <div class="progress-badge" id="progressBadge">
+          <span class="progress-label">学习进度</span>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <span class="progress-text" id="progressText">0%</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- 首页 -->
+      <section class="view active" id="view-home">
+        <div class="hero">
+          <h2>欢迎来复习科学！</h2>
+          <p>本课件涵盖四个单元共 26 个知识点，支持阅读、闪卡记忆、选择题测验和趣味互动。</p>
+        </div>
+        <div class="unit-grid" id="unitGrid"></div>
+        <div class="stats-row" id="statsRow"></div>
+      </section>
+
+      <!-- 知识点 -->
+      <section class="view" id="view-learn">
+        <div class="view-toolbar">
+          <select id="learnUnitSelect" class="select"></select>
+          <input type="search" id="learnSearch" class="search" placeholder="搜索知识点…">
+        </div>
+        <div class="topic-list" id="topicList"></div>
+      </section>
+
+      <!-- 闪卡 -->
+      <section class="view" id="view-flashcard">
+        <div class="view-toolbar">
+          <select id="flashUnitSelect" class="select"></select>
+          <span class="flash-counter" id="flashCounter">1 / 1</span>
+        </div>
+        <div class="flashcard-area">
+          <div class="flashcard" id="flashcard">
+            <div class="flashcard-inner">
+              <div class="flashcard-front">
+                <span class="flash-tag" id="flashTag">单元</span>
+                <h3 id="flashQuestion">问题</h3>
+                <p class="flash-hint">点击卡片查看答案</p>
+              </div>
+              <div class="flashcard-back">
+                <p id="flashAnswer">答案</p>
+              </div>
+            </div>
+          </div>
+          <div class="flash-controls">
+            <button class="btn btn-secondary" id="flashPrev">← 上一张</button>
+            <button class="btn btn-primary" id="flashKnow">我会了 ✓</button>
+            <button class="btn btn-secondary" id="flashNext">下一张 →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="view" id="view-quiz">
+        <div id="quizSetup" class="quiz-setup">
+          <h2>选择测验范围</h2>
+          <div class="quiz-options" id="quizOptions"></div>
+          <button class="btn btn-primary btn-lg" id="startQuiz">开始测验</button>
+        </div>
+        <div id="quizActive" class="quiz-active hidden">
+          <div class="quiz-header">
+            <span id="quizProgress">第 1 / 10 题</span>
+            <span id="quizScore">得分：0</span>
+          </div>
+          <div class="quiz-question" id="quizQuestion"></div>
+          <div class="quiz-choices" id="quizChoices"></div>
+          <div class="quiz-feedback hidden" id="quizFeedback"></div>
+          <button class="btn btn-primary hidden" id="quizNext">下一题</button>
+        </div>
+        <div id="quizResult" class="quiz-result hidden">
+          <div class="result-card">
+            <div class="result-emoji" id="resultEmoji">🎉</div>
+            <h2 id="resultTitle">测验完成！</h2>
+            <p class="result-score" id="resultScore">10 / 10</p>
+            <p id="resultMessage"></p>
+            <div class="result-actions">
+              <button class="btn btn-primary" id="retryQuiz">再测一次</button>
+              <button class="btn btn-secondary" id="reviewWrong">复习错题</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 趣味互动 -->
+      <section class="view" id="view-play">
+        <div class="play-tabs">
+          <button class="play-tab active" data-play="timeline">🚢 船的历史</button>
+          <button class="play-tab" data-play="foodchain">🌿 食物链排序</button>
+          <button class="play-tab" data-play="match">🔗 概念配对</button>
+        </div>
+
+        <div class="play-panel active" id="play-timeline">
+          <p class="play-desc">把船的类型按历史发展顺序排列（从最早到最新）</p>
+          <div class="timeline-slots" id="timelineSlots"></div>
+          <div class="timeline-pool" id="timelinePool"></div>
+          <div class="play-actions">
+            <button class="btn btn-primary" id="checkTimeline">检查答案</button>
+            <button class="btn btn-secondary" id="resetTimeline">重置</button>
+          </div>
+          <div class="play-feedback" id="timelineFeedback"></div>
+        </div>
+
+        <div class="play-panel" id="play-foodchain">
+          <p class="play-desc">把下面的生物按食物链顺序排列（从生产者到顶级消费者）</p>
+          <div class="chain-scenario" id="chainScenario"></div>
+          <div class="chain-slots" id="chainSlots"></div>
+          <div class="chain-pool" id="chainPool"></div>
+          <div class="play-actions">
+            <button class="btn btn-primary" id="checkChain">检查答案</button>
+            <button class="btn btn-secondary" id="nextChain">换一题</button>
+          </div>
+          <div class="play-feedback" id="chainFeedback"></div>
+        </div>
+
+        <div class="play-panel" id="play-match">
+          <p class="play-desc">点击左侧概念，再点击右侧对应的解释进行配对</p>
+          <div class="match-grid">
+            <div class="match-col" id="matchTerms"></div>
+            <div class="match-col" id="matchDefs"></div>
+          </div>
+          <div class="play-actions">
+            <button class="btn btn-secondary" id="resetMatch">重新开始</button>
+          </div>
+          <div class="play-feedback" id="matchFeedback"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>教科版五年级下册科学 · 知识点复习课件</p>
+    </footer>
+  </div>
+
+  <script>
+const UNITS = [
+  {
+    id: 'unit1',
+    title: '第一单元 · 生物与环境',
+    emoji: '🌱',
+    color: '#10b981',
+    topics: [
+      {
+        id: 'u1t1',
+        title: '种子发芽实验',
+        points: [
+          '种子发芽必需条件：一定的水分、充足的空气、适宜的温度',
+          '种子发芽不需要阳光和土壤',
+          '植物后续生长（长成植株）还需要阳光、土壤、养分等',
+          '对比实验：只改变 1 个变量，其他条件保持一致，用来探究单一条件对种子发芽的影响'
+        ]
+      },
+      {
+        id: 'u1t2',
+        title: '绿豆苗的生长',
+        points: [
+          '绿豆苗生长需要：阳光、水分、空气、适宜温度、土壤（养分）',
+          '植物具有向光性：会朝着光照充足的方向生长，是适应环境的表现',
+          '光合作用：绿叶利用阳光，把二氧化碳和水转化为养料，释放氧气，供给自身和其他生物生存'
+        ]
+      },
+      {
+        id: 'u1t3',
+        title: '蚯蚓的选择',
+        points: [
+          '蚯蚓偏好阴暗、潮湿的环境（黑暗湿润土壤）',
+          '不同动物有各自适宜的栖息环境',
+          '生物的生存需要匹配的环境条件，会主动选择适合自己生存的环境'
+        ]
+      },
+      {
+        id: 'u1t4',
+        title: '当环境改变了',
+        points: [
+          '环境（温度、降水、食物）变化时，动物会做出适应行为：青蛙冬眠、大雁迁徙、兔子换毛、蛇过冬等',
+          '植物也会适应环境：落叶树秋冬落叶减少水分消耗，多肉肥厚叶片储存水分适应干旱'
+        ]
+      },
+      {
+        id: 'u1t5',
+        title: '食物链和食物网',
+        points: [
+          '食物链：生物之间吃与被吃的关系，写法：生产者（绿色植物）→ 初级消费者 → 次级消费者',
+          '例：草 → 蝗虫 → 青蛙 → 蛇',
+          '生产者：能自己制造养料的植物；消费者：依靠捕食其他生物生存的动物',
+          '食物网：多条食物链相互交织形成，一种生物灭绝会影响整个食物网的稳定'
+        ]
+      },
+      {
+        id: 'u1t6',
+        title: '设计和制作生态瓶',
+        points: [
+          '生态系统：群落（动植物、微生物）+ 生存环境（水、空气、土壤）共同组成，相互依存',
+          '生态瓶制作要点：先放沙子、水，再种水生植物（制造氧气），最后放小动物；生物数量要平衡',
+          '生态平衡：生物数量和种类相对稳定，环境被破坏会打破平衡'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'unit2',
+    title: '第二单元 · 船的研究',
+    emoji: '🚢',
+    color: '#3b82f6',
+    topics: [
+      {
+        id: 'u2t1',
+        title: '船的历史',
+        points: [
+          '发展历程：独木舟（人力）→ 摇橹木船（人力）→ 帆船（风力）→ 蒸汽船（蒸汽机）→ 轮船（柴油机）→ 潜艇（柴油/核动力）',
+          '演变趋势：载重量更大、行驶更快、更稳定、动力更先进、材料更坚固',
+          '独木舟缺点：载重量小、容易侧翻、稳定性差'
+        ]
+      },
+      {
+        id: 'u2t2',
+        title: '用浮的材料造船',
+        points: [
+          '浮性材料（木头、竹子）制作船，增大排开水的体积，提升载重量',
+          '竹筏比独木舟载重量大、底部宽更稳定，但不耐水浸'
+        ]
+      },
+      {
+        id: 'u2t3',
+        title: '用沉的材料造船',
+        points: [
+          '把沉的材料捏成船形（空心），增大排开的水量，获得更大浮力，就能漂浮',
+          '原理：排开的水越多，受到的浮力越大，越容易浮起来'
+        ]
+      },
+      {
+        id: 'u2t4',
+        title: '增加船的载重量',
+        points: [
+          '提升载重量方法：增大船底面积、做成空心船舱、分隔船舱（防止漏水沉没）、优化船型',
+          '相同材料，船的体积越大，载重量越大；重物均匀摆放可避免侧翻'
+        ]
+      },
+      {
+        id: 'u2t5',
+        title: '给船装上动力',
+        points: [
+          '动力类型：风帆（风力）、橡皮筋动力（弹力）、电动机（电力）、蒸汽机、发动机等',
+          '船舵作用：控制船的行驶方向'
+        ]
+      },
+      {
+        id: 'u2t6',
+        title: '设计、制作与测试小船',
+        points: [
+          '设计步骤：明确任务（载重量、动力、成本）→ 画设计图 → 选材制作 → 测试改进',
+          '测试维度：载重量、行驶速度、行驶方向、稳定性；根据测试问题不断优化结构'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'unit3',
+    title: '第三单元 · 环境与我们',
+    emoji: '🌍',
+    color: '#8b5cf6',
+    topics: [
+      {
+        id: 'u3t1',
+        title: '地球——宇宙的奇迹',
+        points: [
+          '地球是目前唯一有生命的星球，具备生命生存条件：液态水、适宜温度、厚厚的大气层、充足氧气',
+          '大气层保温、阻挡陨石和紫外线；岩石圈提供土壤和矿产资源'
+        ]
+      },
+      {
+        id: 'u3t2',
+        title: '我们面临的环境问题',
+        points: [
+          '主要环境问题：大气污染（雾霾、酸雨）、水污染、固体废弃物污染（垃圾围城）、全球变暖、土地荒漠化、物种灭绝',
+          '成因：人类过度开发、化石燃料燃烧、随意丢弃垃圾、乱砍滥伐等'
+        ]
+      },
+      {
+        id: 'u3t3',
+        title: '珍惜水资源',
+        points: [
+          '地球总水量多，但淡水资源稀缺（可利用淡水占比极少），且分布不均',
+          '节水措施：随手关水龙头、一水多用（淘米水浇花）、使用节水器具、治理污水循环利用'
+        ]
+      },
+      {
+        id: 'u3t4',
+        title: '解决垃圾问题',
+        points: [
+          '垃圾处理方式：分类回收、填埋、焚烧（会产生污染）、堆肥（厨余垃圾）',
+          '垃圾分类：可回收物、厨余垃圾、有害垃圾、其他垃圾；分类能减少污染、回收资源',
+          '减量化：减少一次性用品使用、精简包装，从源头减少垃圾'
+        ]
+      },
+      {
+        id: 'u3t5',
+        title: '合理利用能源',
+        points: [
+          '不可再生能源：煤、石油、天然气（化石燃料，用完无法再生）',
+          '可再生能源：太阳能、风能、水能、地热能',
+          '化石燃料燃烧排放二氧化碳，加剧温室效应（全球变暖）；节能 + 开发新能源是解决方向',
+          '1 度电 = 1 千瓦电器使用 1 小时消耗的电能'
+        ]
+      },
+      {
+        id: 'u3t6',
+        title: '让资源再生',
+        points: [
+          '可再生资源：纸张、塑料、金属等可回收再加工；例：废纸再造新纸、废铁炼钢',
+          '资源再生意义：节约原材料、减少开采破坏环境、降低污染'
+        ]
+      },
+      {
+        id: 'u3t7',
+        title: '分析实际环境问题',
+        points: [
+          '分析思路：找出污染源 → 梳理危害 → 制定治理方案（管控源头、技术治理、宣传教育）',
+          '案例（河道污染）：生活污水、工业废水、养殖排污 → 污染水质 → 鱼虾死亡、危害健康 → 截污排污、种植水生植物净化水质'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'unit4',
+    title: '第四单元 · 热',
+    emoji: '🔥',
+    color: '#f59e0b',
+    topics: [
+      {
+        id: 'u4t1',
+        title: '温度与水的变化',
+        points: [
+          '物体冷热程度叫温度，用温度计测量',
+          '水的三态变化：冰受热融化 → 水；水受热汽化 → 水蒸气；水蒸气遇冷凝结 → 水；水遇冷凝固 → 冰',
+          '标准大气压下：冰熔点 0℃，水沸点 100℃'
+        ]
+      },
+      {
+        id: 'u4t2',
+        title: '水的蒸发和凝结',
+        points: [
+          '蒸发：液态水变成水蒸气（随时随地发生）；温度越高、空气流速越快、表面积越大，蒸发越快',
+          '凝结：水蒸气遇冷变成液态小水珠（例：露珠、冰镇饮料外壁水珠）；降温越明显，凝结越快'
+        ]
+      },
+      {
+        id: 'u4t3',
+        title: '温度不同的物体相互接触',
+        points: [
+          '热传递规律：热量从高温物体传向低温物体，直到两者温度相同（热平衡）',
+          '例：热水倒入冷水，热水降温、冷水升温，最终水温一致'
+        ]
+      },
+      {
+        id: 'u4t4',
+        title: '热在金属中的传递',
+        points: [
+          '热传导：固体内部/固体接触传热（铁锅炒菜）',
+          '热对流：液体、气体靠流动传热（烧水时水上下翻滚）',
+          '热辐射：不靠介质，直接辐射热量（太阳晒地面）',
+          '金属是热的良导体，热量从受热端向四周传递'
+        ]
+      },
+      {
+        id: 'u4t5',
+        title: '热在水中的传递',
+        points: [
+          '水加热时，热水上升、冷水下降，形成对流，整杯水逐渐变热',
+          '液体、气体主要依靠热对流传递热量'
+        ]
+      },
+      {
+        id: 'u4t6',
+        title: '哪个传热快',
+        points: [
+          '热的良导体（金属：铜、铁、铝）：传热速度快，适合制作炊具',
+          '热的不良导体（塑料、木头、陶瓷、空气）：传热慢，用来隔热保温',
+          '铜传热 > 铝 > 铁，金属导热性能有差异'
+        ]
+      },
+      {
+        id: 'u4t7',
+        title: '做个保温杯',
+        points: [
+          '保温原理：减慢热传递（阻隔热传导、对流、辐射）',
+          '保温设计：内胆真空（无对流传导）、内胆镀银（减少热辐射）、外层包裹泡沫/棉布（不良导体隔热）',
+          '保温杯只能减缓热量散失，不能永久保温'
+        ]
+      }
+    ]
+  }
+];
+
+const FLASHCARDS = [
+  { unit: 0, q: '种子发芽需要哪些条件？', a: '一定的水分、充足的空气、适宜的温度。不需要阳光和土壤。' },
+  { unit: 0, q: '什么是对比实验？', a: '只改变 1 个变量，其他条件保持一致，用来探究单一条件的影响。' },
+  { unit: 0, q: '什么是光合作用？', a: '绿叶利用阳光，把二氧化碳和水转化为养料，释放氧气。' },
+  { unit: 0, q: '蚯蚓喜欢什么样的环境？', a: '阴暗、潮湿的环境（黑暗湿润土壤）。' },
+  { unit: 0, q: '动物如何适应环境变化？', a: '青蛙冬眠、大雁迁徙、兔子换毛、蛇过冬等。' },
+  { unit: 0, q: '食物链怎么写？', a: '生产者 → 初级消费者 → 次级消费者，例：草 → 蝗虫 → 青蛙 → 蛇。' },
+  { unit: 0, q: '什么是生产者？什么是消费者？', a: '生产者：能自己制造养料的植物；消费者：依靠捕食其他生物生存的动物。' },
+  { unit: 0, q: '生态瓶制作顺序是什么？', a: '先放沙子、水 → 种水生植物 → 最后放小动物，保持数量平衡。' },
+  { unit: 1, q: '船的发展经历了哪些阶段？', a: '独木舟 → 摇橹木船 → 帆船 → 蒸汽船 → 轮船 → 潜艇。' },
+  { unit: 1, q: '沉的材料怎样能浮起来？', a: '捏成船形（空心），增大排开水的体积，获得更大浮力。' },
+  { unit: 1, q: '怎样增加船的载重量？', a: '增大船底面积、做成空心船舱、分隔船舱、优化船型。' },
+  { unit: 1, q: '船舵有什么作用？', a: '控制船的行驶方向。' },
+  { unit: 1, q: '浮力与排水量有什么关系？', a: '排开的水越多，受到的浮力越大，越容易浮起来。' },
+  { unit: 2, q: '地球为什么能孕育生命？', a: '有液态水、适宜温度、厚厚的大气层、充足氧气。' },
+  { unit: 2, q: '主要环境问题有哪些？', a: '大气污染、水污染、固体废弃物污染、全球变暖、土地荒漠化、物种灭绝。' },
+  { unit: 2, q: '垃圾分类有哪四类？', a: '可回收物、厨余垃圾、有害垃圾、其他垃圾。' },
+  { unit: 2, q: '可再生能源有哪些？', a: '太阳能、风能、水能、地热能。' },
+  { unit: 2, q: '1 度电是什么意思？', a: '1 千瓦电器使用 1 小时消耗的电能。' },
+  { unit: 2, q: '资源再生的意义是什么？', a: '节约原材料、减少开采破坏环境、降低污染。' },
+  { unit: 3, q: '标准大气压下，冰的熔点和水沸点是多少？', a: '冰熔点 0℃，水沸点 100℃。' },
+  { unit: 3, q: '蒸发快慢与什么因素有关？', a: '温度越高、空气流速越快、表面积越大，蒸发越快。' },
+  { unit: 3, q: '热量传递的方向是什么？', a: '从高温物体传向低温物体，直到两者温度相同。' },
+  { unit: 3, q: '热传递的三种方式是什么？', a: '热传导、热对流、热辐射。' },
+  { unit: 3, q: '水加热时热量怎样传递？', a: '热水上升、冷水下降，形成对流。' },
+  { unit: 3, q: '热的良导体和不良导体各举例子。', a: '良导体：铜、铁、铝；不良导体：塑料、木头、陶瓷、空气。' },
+  { unit: 3, q: '保温杯的保温原理是什么？', a: '减慢热传递：真空内胆、镀银减少辐射、泡沫/棉布隔热。' }
+];
+
+const QUIZ_QUESTIONS = [
+  { unit: 0, q: '种子发芽不需要以下哪个条件？', options: ['水分', '空气', '适宜温度', '阳光'], answer: 3, explain: '种子发芽需要水分、空气和适宜温度，不需要阳光和土壤。' },
+  { unit: 0, q: '对比实验的关键是什么？', options: ['改变多个变量', '只改变1个变量', '不做对照', '随机改变条件'], answer: 1, explain: '对比实验只改变1个变量，其他条件保持一致。' },
+  { unit: 0, q: '光合作用释放的气体是？', options: ['二氧化碳', '氮气', '氧气', '氢气'], answer: 2, explain: '光合作用把二氧化碳和水转化为养料，释放氧气。' },
+  { unit: 0, q: '下列哪项是动物适应环境变化的行为？', options: ['植物向光生长', '大雁迁徙', '种子发芽', '光合作用'], answer: 1, explain: '大雁迁徙是动物适应环境（季节变化）的行为。' },
+  { unit: 0, q: '食物链中，绿色植物属于？', options: ['消费者', '生产者', '分解者', '顶级消费者'], answer: 1, explain: '绿色植物能自己制造养料，是生产者。' },
+  { unit: 0, q: '生态瓶制作时，应该先放什么？', options: ['小动物', '水生植物', '沙子和水', '大量鱼'], answer: 2, explain: '制作顺序：沙子、水 → 水生植物 → 小动物。' },
+  { unit: 1, q: '最早的船是哪种？', options: ['帆船', '独木舟', '蒸汽船', '潜艇'], answer: 1, explain: '船的发展从独木舟开始。' },
+  { unit: 1, q: '橡皮泥船能浮起来的原理是？', options: ['材料变轻', '增大排水量', '减少重量', '加入空气泡'], answer: 1, explain: '捏成空心船形增大排开水的体积，浮力增大。' },
+  { unit: 1, q: '分隔船舱的主要作用是？', options: ['增加速度', '防止漏水沉没', '减少重量', '增加美观'], answer: 1, explain: '分隔船舱可以防止一处漏水导致整船沉没。' },
+  { unit: 1, q: '船舵的作用是？', options: ['提供动力', '控制方向', '增加浮力', '减少阻力'], answer: 1, explain: '船舵用来控制船的行驶方向。' },
+  { unit: 1, q: '帆船的动力来源是？', options: ['人力', '风力', '电力', '柴油'], answer: 1, explain: '帆船利用风帆，动力来自风力。' },
+  { unit: 2, q: '地球是目前已知唯一有生命的星球，主要因为？', options: ['离太阳最近', '有液态水和适宜温度', '最大', '没有卫星'], answer: 1, explain: '地球有液态水、适宜温度、大气层和氧气等生命条件。' },
+  { unit: 2, q: '下列属于可再生能源的是？', options: ['煤炭', '石油', '太阳能', '天然气'], answer: 2, explain: '太阳能、风能、水能、地热能都是可再生能源。' },
+  { unit: 2, q: '废电池应该投入哪类垃圾桶？', options: ['可回收物', '厨余垃圾', '有害垃圾', '其他垃圾'], answer: 2, explain: '废电池含有有害物质，属于有害垃圾。' },
+  { unit: 2, q: '化石燃料燃烧主要导致什么问题？', options: ['臭氧层空洞', '温室效应', '酸雨唯一原因', '白色污染'], answer: 1, explain: '化石燃料燃烧排放二氧化碳，加剧温室效应。' },
+  { unit: 2, q: '下列节水做法正确的是？', options: ['长时间开水龙头', '淘米水浇花', '用大量水洗车', '不修理漏水龙头'], answer: 1, explain: '一水多用（如淘米水浇花）是有效的节水措施。' },
+  { unit: 2, q: '废纸回收再造新纸属于？', options: ['减量化', '资源再生', '焚烧处理', '填埋处理'], answer: 1, explain: '废纸回收再加工是资源再生的典型例子。' },
+  { unit: 3, q: '标准大气压下，水的沸点是？', options: ['0℃', '50℃', '100℃', '120℃'], answer: 2, explain: '标准大气压下，水沸点 100℃，冰熔点 0℃。' },
+  { unit: 3, q: '水蒸气遇冷变成小水珠的过程叫？', options: ['蒸发', '凝结', '融化', '升华'], answer: 1, explain: '水蒸气遇冷变成液态水是凝结。' },
+  { unit: 3, q: '热量传递的方向是？', options: ['低温到高温', '高温到低温', '随机方向', '只向上传递'], answer: 1, explain: '热量总是从高温物体传向低温物体。' },
+  { unit: 3, q: '铁锅炒菜主要利用哪种热传递方式？', options: ['热辐射', '热对流', '热传导', '不传递热量'], answer: 2, explain: '固体接触传热是热传导，铁锅炒菜就是典型例子。' },
+  { unit: 3, q: '烧水时水上下翻滚，主要是？', options: ['热传导', '热对流', '热辐射', '蒸发'], answer: 1, explain: '液体靠流动传热是热对流。' },
+  { unit: 3, q: '下列哪种材料传热最快？', options: ['塑料', '木头', '铜', '陶瓷'], answer: 2, explain: '铜是热的良导体，传热速度：铜 > 铝 > 铁。' },
+  { unit: 3, q: '保温杯内胆镀银是为了？', options: ['增加容量', '减少热辐射', '增加重量', '防止漏水'], answer: 1, explain: '镀银可以减少热辐射，帮助保温。' },
+  { unit: 0, q: '一种生物灭绝会对食物网产生什么影响？', options: ['没有影响', '影响整个食物网稳定', '只影响一种动物', '增加物种数量'], answer: 1, explain: '食物网中各生物相互关联，一种灭绝会影响整体稳定。' },
+  { unit: 1, q: '相同材料做的船，体积越大？', options: ['载重量越小', '载重量越大', '载重量不变', '更容易沉'], answer: 1, explain: '相同材料，船的体积越大，载重量越大。' },
+  { unit: 2, q: '减少垃圾最根本的方法是？', options: ['填埋', '焚烧', '减量化', '随意丢弃'], answer: 2, explain: '从源头减少垃圾产生（减量化）是最根本的方法。' },
+  { unit: 3, q: '太阳晒地面主要是哪种热传递？', options: ['热传导', '热对流', '热辐射', '蒸发'], answer: 2, explain: '太阳热量通过空间直接辐射到地面，属于热辐射。' }
+];
+
+const SHIP_TIMELINE = [
+  '独木舟（人力）',
+  '摇橹木船（人力）',
+  '帆船（风力）',
+  '蒸汽船（蒸汽机）',
+  '轮船（柴油机）',
+  '潜艇（柴油/核动力）'
+];
+
+const FOOD_CHAINS = [
+  { name: '草原食物链', items: ['草', '蝗虫', '青蛙', '蛇'] },
+  { name: '海洋食物链', items: ['浮游植物', '小虾', '小鱼', '大鱼'] },
+  { name: '森林食物链', items: ['树叶', '毛毛虫', '鸟', '鹰'] }
+];
+
+const MATCH_PAIRS = [
+  { term: '生产者', def: '能自己制造养料的绿色植物' },
+  { term: '消费者', def: '依靠捕食其他生物生存的动物' },
+  { term: '热传导', def: '固体内部或接触面之间的传热' },
+  { term: '热对流', def: '液体和气体靠流动传递热量' },
+  { term: '热辐射', def: '不依靠介质直接传递热量' },
+  { term: '温室效应', def: '二氧化碳等气体导致全球变暖' },
+  { term: '生态平衡', def: '生物数量种类与环境相对稳定' },
+  { term: '可再生能源', def: '太阳能、风能等可重复利用的能源' }
+];
+
+function getAllTopicIds() {
+  return UNITS.flatMap(u => u.topics.map(t => t.id));
+}
+
+function getTopicById(id) {
+  for (const unit of UNITS) {
+    const topic = unit.topics.find(t => t.id === id);
+    if (topic) return { unit, topic };
+  }
+  return null;
+}
+
+function getTotalPoints() {
+  return UNITS.reduce((sum, u) => sum + u.topics.reduce((s, t) => s + t.points.length, 0), 0);
+}
+
+</script>
+  <script>
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'science-review-progress';
+
+  let state = {
+    completedTopics: [],
+    knownFlashcards: [],
+    currentView: 'home',
+    flashIndex: 0,
+    flashUnit: 'all',
+    quizQuestions: [],
+    quizIndex: 0,
+    quizScore: 0,
+    quizWrong: [],
+    selectedQuizUnits: ['all'],
+    chainIndex: 0,
+    matchSelected: null,
+    matchPairs: []
+  };
+
+  function loadProgress() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved) {
+        state.completedTopics = saved.completedTopics || [];
+        state.knownFlashcards = saved.knownFlashcards || [];
+      }
+    } catch (_) { /* ignore */ }
+  }
+
+  function saveProgress() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      completedTopics: state.completedTopics,
+      knownFlashcards: state.knownFlashcards
+    }));
+    updateProgressUI();
+  }
+
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return document.querySelectorAll(sel); }
+
+  function switchView(view) {
+    state.currentView = view;
+    $$('.view').forEach(v => v.classList.remove('active'));
+    $$('.nav-btn').forEach(b => b.classList.remove('active'));
+    $(`#view-${view}`).classList.add('active');
+    $(`.nav-btn[data-view="${view}"]`).classList.add('active');
+  }
+
+  function updateProgressUI() {
+    const totalTopics = getAllTopicIds().length;
+    const completed = state.completedTopics.length;
+    const pct = totalTopics ? Math.round((completed / totalTopics) * 100) : 0;
+    $('#progressFill').style.width = pct + '%';
+    $('#progressText').textContent = pct + '%';
+  }
+
+  /* ── Home ── */
+  function renderHome() {
+    const grid = $('#unitGrid');
+    grid.innerHTML = UNITS.map((unit, i) => {
+      const done = unit.topics.filter(t => state.completedTopics.includes(t.id)).length;
+      const total = unit.topics.length;
+      return `
+        <div class="unit-card" data-unit="${i}">
+          <div class="unit-num">${i + 1}</div>
+          <h3>${unit.emoji} ${unit.title}</h3>
+          <p>${total} 个知识点</p>
+          <div class="unit-topics">${unit.topics.map(t => t.title).join(' · ')}</div>
+          <div class="unit-progress">
+            <span>已学 ${done}/${total}</span>
+          </div>
+        </div>`;
+    }).join('');
+
+    grid.querySelectorAll('.unit-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const idx = +card.dataset.unit;
+        switchView('learn');
+        $('#learnUnitSelect').value = idx;
+        renderTopics();
+      });
+    });
+
+    const totalTopics = getAllTopicIds().length;
+    const totalPoints = getTotalPoints();
+    $('#statsRow').innerHTML = `
+      <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">单元</div></div>
+      <div class="stat-card"><div class="stat-num">${totalTopics}</div><div class="stat-label">知识点</div></div>
+      <div class="stat-card"><div class="stat-num">${totalPoints}</div><div class="stat-label">要点</div></div>
+      <div class="stat-card"><div class="stat-num">${QUIZ_QUESTIONS.length}</div><div class="stat-label">测验题</div></div>`;
+  }
+
+  /* ── Learn ── */
+  function initLearnSelect() {
+    const sel = $('#learnUnitSelect');
+    sel.innerHTML = '<option value="all">全部单元</option>' +
+      UNITS.map((u, i) => `<option value="${i}">${u.title}</option>`).join('');
+    sel.addEventListener('change', renderTopics);
+    $('#learnSearch').addEventListener('input', renderTopics);
+  }
+
+  function renderTopics() {
+    const unitVal = $('#learnUnitSelect').value;
+    const search = $('#learnSearch').value.trim().toLowerCase();
+    const list = $('#topicList');
+    let html = '';
+
+    UNITS.forEach((unit, ui) => {
+      if (unitVal !== 'all' && +unitVal !== ui) return;
+      unit.topics.forEach(topic => {
+        const text = (topic.title + ' ' + topic.points.join(' ')).toLowerCase();
+        if (search && !text.includes(search)) return;
+        const done = state.completedTopics.includes(topic.id);
+        html += `
+          <div class="topic-card" data-id="${topic.id}">
+            <div class="topic-header">
+              <h3><span class="topic-badge">${unit.emoji} 单元${ui + 1}</span> ${topic.title}</h3>
+              <span class="chevron">▼</span>
+            </div>
+            <div class="topic-body">
+              <div class="topic-content">
+                <ul class="point-list">
+                  ${topic.points.map(p => `<li>${p}</li>`).join('')}
+                </ul>
+                <div class="topic-actions">
+                  <button class="btn-done ${done ? 'completed' : ''}" data-id="${topic.id}">
+                    ${done ? '✓ 已掌握' : '标记为已掌握'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      });
+    });
+
+    list.innerHTML = html || '<p style="text-align:center;color:#5a6a7e;padding:2rem;">没有找到匹配的知识点</p>';
+
+    list.querySelectorAll('.topic-header').forEach(h => {
+      h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+    });
+
+    list.querySelectorAll('.btn-done').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const idx = state.completedTopics.indexOf(id);
+        if (idx >= 0) state.completedTopics.splice(idx, 1);
+        else state.completedTopics.push(id);
+        saveProgress();
+        renderTopics();
+        renderHome();
+      });
+    });
+  }
+
+  /* ── Flashcards ── */
+  function initFlashSelect() {
+    const sel = $('#flashUnitSelect');
+    sel.innerHTML = '<option value="all">全部单元</option>' +
+      UNITS.map((u, i) => `<option value="${i}">第${i + 1}单元</option>`).join('');
+    sel.addEventListener('change', () => {
+      state.flashUnit = sel.value;
+      state.flashIndex = 0;
+      renderFlashcard();
+    });
+  }
+
+  function getFilteredFlashcards() {
+    if (state.flashUnit === 'all') return FLASHCARDS;
+    return FLASHCARDS.filter(c => c.unit === +state.flashUnit);
+  }
+
+  function renderFlashcard() {
+    const cards = getFilteredFlashcards();
+    if (!cards.length) return;
+    if (state.flashIndex >= cards.length) state.flashIndex = 0;
+    const card = cards[state.flashIndex];
+    const fc = $('#flashcard');
+    fc.classList.remove('flipped');
+
+    $('#flashTag').textContent = UNITS[card.unit].title;
+    $('#flashQuestion').textContent = card.q;
+    $('#flashAnswer').textContent = card.a;
+    $('#flashCounter').textContent = `${state.flashIndex + 1} / ${cards.length}`;
+  }
+
+  function setupFlashControls() {
+    $('#flashcard').addEventListener('click', () => {
+      $('#flashcard').classList.toggle('flipped');
+    });
+
+    $('#flashPrev').addEventListener('click', () => {
+      const cards = getFilteredFlashcards();
+      state.flashIndex = (state.flashIndex - 1 + cards.length) % cards.length;
+      renderFlashcard();
+    });
+
+    $('#flashNext').addEventListener('click', () => {
+      const cards = getFilteredFlashcards();
+      state.flashIndex = (state.flashIndex + 1) % cards.length;
+      renderFlashcard();
+    });
+
+    $('#flashKnow').addEventListener('click', () => {
+      const cards = getFilteredFlashcards();
+      const key = cards[state.flashIndex].q;
+      if (!state.knownFlashcards.includes(key)) {
+        state.knownFlashcards.push(key);
+        saveProgress();
+      }
+      state.flashIndex = (state.flashIndex + 1) % cards.length;
+      renderFlashcard();
+    });
+  }
+
+  /* ── Quiz ── */
+  function initQuizSetup() {
+    const opts = $('#quizOptions');
+    opts.innerHTML = `
+      <button class="quiz-opt selected" data-unit="all">全部单元</button>
+      ${UNITS.map((u, i) => `<button class="quiz-opt" data-unit="${i}">${u.emoji} 第${i + 1}单元</button>`).join('')}`;
+
+    opts.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.unit;
+        if (val === 'all') {
+          opts.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          state.selectedQuizUnits = ['all'];
+        } else {
+          opts.querySelector('[data-unit="all"]').classList.remove('selected');
+          btn.classList.toggle('selected');
+          const selected = [...opts.querySelectorAll('.quiz-opt.selected')].map(b => b.dataset.unit);
+          state.selectedQuizUnits = selected.length ? selected : ['all'];
+          if (!selected.length) opts.querySelector('[data-unit="all"]').classList.add('selected');
+        }
+      });
+    });
+
+    $('#startQuiz').addEventListener('click', startQuiz);
+    $('#quizNext').addEventListener('click', nextQuizQuestion);
+    $('#retryQuiz').addEventListener('click', () => {
+      showQuizSection('setup');
+    });
+    $('#reviewWrong').addEventListener('click', () => {
+      if (state.quizWrong.length) {
+        state.quizQuestions = [...state.quizWrong];
+        state.quizIndex = 0;
+        state.quizScore = 0;
+        state.quizWrong = [];
+        showQuizSection('active');
+        renderQuizQuestion();
+      } else {
+        showQuizSection('setup');
+      }
+    });
+  }
+
+  function getQuizPool() {
+    if (state.selectedQuizUnits.includes('all')) return [...QUIZ_QUESTIONS];
+    return QUIZ_QUESTIONS.filter(q => state.selectedQuizUnits.includes(String(q.unit)));
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function startQuiz() {
+    const pool = getQuizPool();
+    state.quizQuestions = shuffle(pool).slice(0, Math.min(10, pool.length));
+    state.quizIndex = 0;
+    state.quizScore = 0;
+    state.quizWrong = [];
+    showQuizSection('active');
+    renderQuizQuestion();
+  }
+
+  function showQuizSection(section) {
+    $('#quizSetup').classList.toggle('hidden', section !== 'setup');
+    $('#quizActive').classList.toggle('hidden', section !== 'active');
+    $('#quizResult').classList.toggle('hidden', section !== 'result');
+  }
+
+  function renderQuizQuestion() {
+    const q = state.quizQuestions[state.quizIndex];
+    $('#quizProgress').textContent = `第 ${state.quizIndex + 1} / ${state.quizQuestions.length} 题`;
+    $('#quizScore').textContent = `得分：${state.quizScore}`;
+    $('#quizQuestion').textContent = q.q;
+    $('#quizFeedback').classList.add('hidden');
+    $('#quizNext').classList.add('hidden');
+
+    const choices = $('#quizChoices');
+    choices.innerHTML = q.options.map((opt, i) =>
+      `<button class="quiz-choice" data-idx="${i}">${String.fromCharCode(65 + i)}. ${opt}</button>`
+    ).join('');
+
+    choices.querySelectorAll('.quiz-choice').forEach(btn => {
+      btn.addEventListener('click', () => answerQuiz(+btn.dataset.idx));
+    });
+  }
+
+  function answerQuiz(selected) {
+    const q = state.quizQuestions[state.quizIndex];
+    const correct = q.answer;
+    const buttons = $$('#quizChoices .quiz-choice');
+
+    buttons.forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === correct) btn.classList.add('correct');
+      else if (i === selected) btn.classList.add('wrong');
+    });
+
+    const fb = $('#quizFeedback');
+    fb.classList.remove('hidden', 'correct-fb', 'wrong-fb');
+
+    if (selected === correct) {
+      state.quizScore++;
+      fb.classList.add('correct-fb');
+      fb.textContent = '✓ 回答正确！' + (q.explain ? ' ' + q.explain : '');
+    } else {
+      state.quizWrong.push(q);
+      fb.classList.add('wrong-fb');
+      fb.textContent = '✗ 正确答案是 ' + String.fromCharCode(65 + correct) + '。' + q.explain;
+    }
+
+    $('#quizScore').textContent = `得分：${state.quizScore}`;
+    $('#quizNext').classList.remove('hidden');
+    $('#quizNext').textContent = state.quizIndex + 1 >= state.quizQuestions.length ? '查看结果' : '下一题';
+  }
+
+  function nextQuizQuestion() {
+    state.quizIndex++;
+    if (state.quizIndex >= state.quizQuestions.length) {
+      showQuizResult();
+    } else {
+      renderQuizQuestion();
+    }
+  }
+
+  function showQuizResult() {
+    showQuizSection('result');
+    const total = state.quizQuestions.length;
+    const score = state.quizScore;
+    const pct = Math.round((score / total) * 100);
+
+    $('#resultScore').textContent = `${score} / ${total}`;
+    if (pct >= 90) {
+      $('#resultEmoji').textContent = '🏆';
+      $('#resultTitle').textContent = '太棒了！';
+      $('#resultMessage').textContent = '你已经很好地掌握了这些知识，继续保持！';
+    } else if (pct >= 70) {
+      $('#resultEmoji').textContent = '🎉';
+      $('#resultTitle').textContent = '不错哦！';
+      $('#resultMessage').textContent = '大部分知识点已经掌握，再看看错题就更完美了。';
+    } else if (pct >= 50) {
+      $('#resultEmoji').textContent = '💪';
+      $('#resultTitle').textContent = '继续加油！';
+      $('#resultMessage').textContent = '还有一些知识点需要复习，建议先用闪卡记忆一遍。';
+    } else {
+      $('#resultEmoji').textContent = '📚';
+      $('#resultTitle').textContent = '别灰心！';
+      $('#resultMessage').textContent = '建议回到「知识点」模块仔细阅读，再用闪卡反复记忆。';
+    }
+  }
+
+  /* ── Play: Timeline ── */
+  function initTimeline() {
+    resetTimeline();
+    $('#checkTimeline').addEventListener('click', checkTimeline);
+    $('#resetTimeline').addEventListener('click', resetTimeline);
+  }
+
+  function resetTimeline() {
+    const shuffled = shuffle(SHIP_TIMELINE);
+    const slots = $('#timelineSlots');
+    const pool = $('#timelinePool');
+    $('#timelineFeedback').textContent = '';
+    $('#timelineFeedback').className = 'play-feedback';
+
+    slots.innerHTML = SHIP_TIMELINE.map((_, i) =>
+      `<span class="slot-num">${i + 1}</span>`
+    ).join('');
+
+    pool.innerHTML = shuffled.map((name, i) =>
+      `<div class="drag-item" draggable="true" data-name="${name}" data-idx="${i}">${name}</div>`
+    ).join('');
+
+    setupDragDrop(slots, pool);
+  }
+
+  function checkTimeline() {
+    const slots = $('#timelineSlots');
+    const items = [...slots.querySelectorAll('.drag-item')];
+    let allCorrect = items.length === SHIP_TIMELINE.length;
+    items.forEach((item, i) => {
+      const correct = item.dataset.name === SHIP_TIMELINE[i];
+      item.classList.toggle('correct-item', correct);
+      item.classList.toggle('wrong-item', !correct);
+      if (!correct) allCorrect = false;
+    });
+    const fb = $('#timelineFeedback');
+    if (allCorrect) {
+      fb.className = 'play-feedback success';
+      fb.textContent = '🎉 完全正确！你记住了船的发展顺序。';
+    } else {
+      fb.className = 'play-feedback error';
+      fb.textContent = '还有些位置不对，绿色是正确的，红色需要调整。点击「重置」再试一次。';
+    }
+  }
+
+  /* ── Play: Food Chain ── */
+  function initFoodChain() {
+    state.chainIndex = 0;
+    renderFoodChain();
+    $('#checkChain').addEventListener('click', checkFoodChain);
+    $('#nextChain').addEventListener('click', () => {
+      state.chainIndex = (state.chainIndex + 1) % FOOD_CHAINS.length;
+      renderFoodChain();
+    });
+  }
+
+  function renderFoodChain() {
+    const chain = FOOD_CHAINS[state.chainIndex];
+    $('#chainScenario').textContent = `📋 ${chain.name}`;
+    const shuffled = shuffle(chain.items);
+    const slots = $('#chainSlots');
+    const pool = $('#chainPool');
+    $('#chainFeedback').textContent = '';
+    $('#chainFeedback').className = 'play-feedback';
+
+    slots.innerHTML = chain.items.map((_, i) => {
+      const labels = ['生产者', '初级消费者', '次级消费者', '顶级消费者'];
+      return `<span class="slot-num" title="${labels[i] || ''}">${i + 1}</span>`;
+    }).join('');
+
+    pool.innerHTML = shuffled.map(name =>
+      `<div class="drag-item" draggable="true" data-name="${name}">${name}</div>`
+    ).join('');
+
+    setupDragDrop(slots, pool);
+  }
+
+  function checkFoodChain() {
+    const chain = FOOD_CHAINS[state.chainIndex];
+    const slots = $('#chainSlots');
+    const items = [...slots.querySelectorAll('.drag-item')];
+    let allCorrect = items.length === chain.items.length;
+    items.forEach((item, i) => {
+      const correct = item.dataset.name === chain.items[i];
+      item.classList.toggle('correct-item', correct);
+      item.classList.toggle('wrong-item', !correct);
+      if (!correct) allCorrect = false;
+    });
+    const fb = $('#chainFeedback');
+    if (allCorrect) {
+      fb.className = 'play-feedback success';
+      fb.textContent = '🎉 正确！' + chain.items.join(' → ');
+    } else {
+      fb.className = 'play-feedback error';
+      fb.textContent = '顺序还不对，提示：从生产者（植物）开始，到顶级消费者结束。';
+    }
+  }
+
+  /* ── Play: Match ── */
+  function initMatch() {
+    resetMatch();
+    $('#resetMatch').addEventListener('click', resetMatch);
+  }
+
+  function resetMatch() {
+    state.matchSelected = null;
+    state.matchPairs = shuffle(MATCH_PAIRS);
+    const terms = $('#matchTerms');
+    const defs = $('#matchDefs');
+    $('#matchFeedback').textContent = '';
+    $('#matchFeedback').className = 'play-feedback';
+
+    const shuffledDefs = shuffle(state.matchPairs.map(p => p.def));
+    terms.innerHTML = state.matchPairs.map((p, i) =>
+      `<div class="match-item" data-side="term" data-idx="${i}">${p.term}</div>`
+    ).join('');
+    defs.innerHTML = shuffledDefs.map((d, i) =>
+      `<div class="match-item" data-side="def" data-def="${d}">${d}</div>`
+    ).join('');
+
+    $$('.match-item').forEach(item => {
+      item.addEventListener('click', () => handleMatchClick(item));
+    });
+  }
+
+  function handleMatchClick(item) {
+    if (item.classList.contains('matched')) return;
+
+    if (!state.matchSelected) {
+      state.matchSelected = item;
+      item.classList.add('selected');
+      return;
+    }
+
+    if (state.matchSelected === item) {
+      item.classList.remove('selected');
+      state.matchSelected = null;
+      return;
+    }
+
+    if (state.matchSelected.dataset.side === item.dataset.side) {
+      state.matchSelected.classList.remove('selected');
+      state.matchSelected = item;
+      item.classList.add('selected');
+      return;
+    }
+
+    const termEl = state.matchSelected.dataset.side === 'term' ? state.matchSelected : item;
+    const defEl = state.matchSelected.dataset.side === 'def' ? state.matchSelected : item;
+    const pair = state.matchPairs[+termEl.dataset.idx];
+    const correct = pair.def === defEl.dataset.def;
+
+    if (correct) {
+      termEl.classList.remove('selected');
+      termEl.classList.add('matched');
+      defEl.classList.add('matched');
+      state.matchSelected = null;
+
+      const remaining = $$('.match-item:not(.matched)').length;
+      if (remaining === 0) {
+        $('#matchFeedback').className = 'play-feedback success';
+        $('#matchFeedback').textContent = '🎉 全部配对正确！概念掌握得很棒！';
+      }
+    } else {
+      termEl.classList.add('wrong-flash');
+      defEl.classList.add('wrong-flash');
+      setTimeout(() => {
+        termEl.classList.remove('wrong-flash', 'selected');
+        defEl.classList.remove('wrong-flash', 'selected');
+      }, 500);
+      state.matchSelected = null;
+    }
+  }
+
+  /* ── Drag & Drop ── */
+  function setupDragDrop(slotsContainer, poolContainer) {
+    let dragged = null;
+
+    function onDragStart(e) {
+      dragged = e.target;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => dragged.style.opacity = '0.5', 0);
+    }
+
+    function onDragEnd() {
+      if (dragged) dragged.style.opacity = '1';
+      dragged = null;
+    }
+
+    function onDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+
+    function onDropSlot(e) {
+      e.preventDefault();
+      if (!dragged) return;
+      const target = e.target.closest('.timeline-slots, .chain-slots') ? e.target : null;
+      if (target && (target.classList.contains('drag-item') || target.classList.contains('slot-num') || target === slotsContainer)) {
+        slotsContainer.appendChild(dragged);
+        dragged.classList.add('placed');
+      }
+    }
+
+    function onDropPool(e) {
+      e.preventDefault();
+      if (!dragged) return;
+      poolContainer.appendChild(dragged);
+      dragged.classList.remove('placed');
+    }
+
+    [poolContainer, slotsContainer].forEach(container => {
+      container.addEventListener('dragover', onDragOver);
+    });
+
+    slotsContainer.addEventListener('drop', onDropSlot);
+    poolContainer.addEventListener('drop', onDropPool);
+
+    poolContainer.querySelectorAll('.drag-item').forEach(item => {
+      item.addEventListener('dragstart', onDragStart);
+      item.addEventListener('dragend', onDragEnd);
+    });
+
+    slotsContainer.addEventListener('dragstart', onDragStart);
+    slotsContainer.addEventListener('dragend', onDragEnd);
+  }
+
+  /* ── Play tabs ── */
+  function initPlayTabs() {
+    $$('.play-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        $$('.play-tab').forEach(t => t.classList.remove('active'));
+        $$('.play-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        $(`#play-${tab.dataset.play}`).classList.add('active');
+      });
+    });
+  }
+
+  /* ── Nav ── */
+  function initNav() {
+    $$('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchView(btn.dataset.view));
+    });
+  }
+
+  /* ── Init ── */
+  function init() {
+    loadProgress();
+    initNav();
+    initLearnSelect();
+    initFlashSelect();
+    setupFlashControls();
+    initQuizSetup();
+    initTimeline();
+    initFoodChain();
+    initMatch();
+    initPlayTabs();
+    renderHome();
+    renderTopics();
+    renderFlashcard();
+    updateProgressUI();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+
+</script>
+</body>
+</html>

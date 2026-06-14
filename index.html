@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>五年级下册科学 · 互动复习</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-icon">🔬</span>
+          <div>
+            <h1>五年级下册科学</h1>
+            <p>教科版 · 互动复习课件</p>
+          </div>
+        </div>
+        <nav class="nav" id="mainNav">
+          <button class="nav-btn active" data-view="home">首页</button>
+          <button class="nav-btn" data-view="learn">知识点</button>
+          <button class="nav-btn" data-view="flashcard">闪卡</button>
+          <button class="nav-btn" data-view="quiz">测验</button>
+          <button class="nav-btn" data-view="play">趣味互动</button>
+        </nav>
+        <div class="progress-badge" id="progressBadge">
+          <span class="progress-label">学习进度</span>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <span class="progress-text" id="progressText">0%</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- 首页 -->
+      <section class="view active" id="view-home">
+        <div class="hero">
+          <h2>欢迎来复习科学！</h2>
+          <p>本课件涵盖四个单元共 26 个知识点，支持阅读、闪卡记忆、选择题测验和趣味互动。</p>
+        </div>
+        <div class="unit-grid" id="unitGrid"></div>
+        <div class="stats-row" id="statsRow"></div>
+      </section>
+
+      <!-- 知识点 -->
+      <section class="view" id="view-learn">
+        <div class="view-toolbar">
+          <select id="learnUnitSelect" class="select"></select>
+          <input type="search" id="learnSearch" class="search" placeholder="搜索知识点…">
+        </div>
+        <div class="topic-list" id="topicList"></div>
+      </section>
+
+      <!-- 闪卡 -->
+      <section class="view" id="view-flashcard">
+        <div class="view-toolbar">
+          <select id="flashUnitSelect" class="select"></select>
+          <span class="flash-counter" id="flashCounter">1 / 1</span>
+        </div>
+        <div class="flashcard-area">
+          <div class="flashcard" id="flashcard">
+            <div class="flashcard-inner">
+              <div class="flashcard-front">
+                <span class="flash-tag" id="flashTag">单元</span>
+                <h3 id="flashQuestion">问题</h3>
+                <p class="flash-hint">点击卡片查看答案</p>
+              </div>
+              <div class="flashcard-back">
+                <p id="flashAnswer">答案</p>
+              </div>
+            </div>
+          </div>
+          <div class="flash-controls">
+            <button class="btn btn-secondary" id="flashPrev">← 上一张</button>
+            <button class="btn btn-primary" id="flashKnow">我会了 ✓</button>
+            <button class="btn btn-secondary" id="flashNext">下一张 →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测验 -->
+      <section class="view" id="view-quiz">
+        <div id="quizSetup" class="quiz-setup">
+          <h2>选择测验范围</h2>
+          <div class="quiz-options" id="quizOptions"></div>
+          <button class="btn btn-primary btn-lg" id="startQuiz">开始测验</button>
+        </div>
+        <div id="quizActive" class="quiz-active hidden">
+          <div class="quiz-header">
+            <span id="quizProgress">第 1 / 10 题</span>
+            <span id="quizScore">得分：0</span>
+          </div>
+          <div class="quiz-question" id="quizQuestion"></div>
+          <div class="quiz-choices" id="quizChoices"></div>
+          <div class="quiz-feedback hidden" id="quizFeedback"></div>
+          <button class="btn btn-primary hidden" id="quizNext">下一题</button>
+        </div>
+        <div id="quizResult" class="quiz-result hidden">
+          <div class="result-card">
+            <div class="result-emoji" id="resultEmoji">🎉</div>
+            <h2 id="resultTitle">测验完成！</h2>
+            <p class="result-score" id="resultScore">10 / 10</p>
+            <p id="resultMessage"></p>
+            <div class="result-actions">
+              <button class="btn btn-primary" id="retryQuiz">再测一次</button>
+              <button class="btn btn-secondary" id="reviewWrong">复习错题</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 趣味互动 -->
+      <section class="view" id="view-play">
+        <div class="play-tabs">
+          <button class="play-tab active" data-play="timeline">🚢 船的历史</button>
+          <button class="play-tab" data-play="foodchain">🌿 食物链排序</button>
+          <button class="play-tab" data-play="match">🔗 概念配对</button>
+        </div>
+
+        <div class="play-panel active" id="play-timeline">
+          <p class="play-desc">把船的类型按历史发展顺序排列（从最早到最新）</p>
+          <div class="timeline-slots" id="timelineSlots"></div>
+          <div class="timeline-pool" id="timelinePool"></div>
+          <div class="play-actions">
+            <button class="btn btn-primary" id="checkTimeline">检查答案</button>
+            <button class="btn btn-secondary" id="resetTimeline">重置</button>
+          </div>
+          <div class="play-feedback" id="timelineFeedback"></div>
+        </div>
+
+        <div class="play-panel" id="play-foodchain">
+          <p class="play-desc">把下面的生物按食物链顺序排列（从生产者到顶级消费者）</p>
+          <div class="chain-scenario" id="chainScenario"></div>
+          <div class="chain-slots" id="chainSlots"></div>
+          <div class="chain-pool" id="chainPool"></div>
+          <div class="play-actions">
+            <button class="btn btn-primary" id="checkChain">检查答案</button>
+            <button class="btn btn-secondary" id="nextChain">换一题</button>
+          </div>
+          <div class="play-feedback" id="chainFeedback"></div>
+        </div>
+
+        <div class="play-panel" id="play-match">
+          <p class="play-desc">点击左侧概念，再点击右侧对应的解释进行配对</p>
+          <div class="match-grid">
+            <div class="match-col" id="matchTerms"></div>
+            <div class="match-col" id="matchDefs"></div>
+          </div>
+          <div class="play-actions">
+            <button class="btn btn-secondary" id="resetMatch">重新开始</button>
+          </div>
+          <div class="play-feedback" id="matchFeedback"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>教科版五年级下册科学 · 知识点复习课件</p>
+    </footer>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
