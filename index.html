@@ -3,41 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>五年级下册科学 · 互动复习</title>
+  <title>康煜承 · 五年级复习课件</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="app">
     <header class="header">
       <div class="header-inner">
         <div class="logo">
-          <span class="logo-icon">🔬</span>
+          <span class="logo-icon" id="logoIcon">🔬</span>
           <div>
-            <h1>五年级下册科学</h1>
-            <p>教科版 · 互动复习课件</p>
+            <h1 id="siteTitle">五年级下册科学</h1>
+            <p id="siteSubtitle">教科版 · 互动复习课件</p>
           </div>
         </div>
-        <nav class="nav" id="mainNav">
-          <button class="nav-btn active" data-view="home">首页</button>
-          <button class="nav-btn" data-view="learn">知识点</button>
-          <button class="nav-btn" data-view="flashcard">闪卡</button>
-          <button class="nav-btn" data-view="quiz">测验</button>
-          <button class="nav-btn" data-view="play">趣味互动</button>
+
+        <div class="subject-bar">
+          <button class="subject-btn active" data-subject="science">🔬 科学</button>
+          <button class="subject-btn" data-subject="english">📘 英语</button>
+          <button class="subject-btn" data-subject="math">📐 数学</button>
+          <button class="subject-btn" data-subject="chinese">📖 语文</button>
+        </div>
+
+        <nav class="nav" id="scienceNav">
+          <button class="nav-btn active" data-subject="science" data-view="home">首页</button>
+          <button class="nav-btn" data-subject="science" data-view="learn">知识点</button>
+          <button class="nav-btn" data-subject="science" data-view="flashcard">闪卡</button>
+          <button class="nav-btn" data-subject="science" data-view="quiz">测验</button>
+          <button class="nav-btn" data-subject="science" data-view="play">趣味互动</button>
         </nav>
-        <div class="progress-badge" id="progressBadge">
+
+        <nav class="nav hidden" id="englishNav">
+          <button class="nav-btn active" data-subject="english" data-view="eng-home">首页</button>
+          <button class="nav-btn" data-subject="english" data-view="eng-learn">知识点</button>
+          <button class="nav-btn" data-subject="english" data-view="eng-flashcard">闪卡</button>
+          <button class="nav-btn" data-subject="english" data-view="eng-quiz">测验</button>
+          <button class="nav-btn" data-subject="english" data-view="eng-play">趣味互动</button>
+        </nav>
+
+        <nav class="nav hidden" id="mathNav">
+          <button class="nav-btn active" data-subject="math" data-view="math-home">首页</button>
+          <button class="nav-btn" data-subject="math" data-view="math-learn">知识点</button>
+          <button class="nav-btn" data-subject="math" data-view="math-flashcard">闪卡</button>
+          <button class="nav-btn" data-subject="math" data-view="math-quiz">测验</button>
+          <button class="nav-btn" data-subject="math" data-view="math-play">趣味互动</button>
+        </nav>
+
+        <nav class="nav hidden" id="chineseNav">
+          <button class="nav-btn active" data-subject="chinese" data-view="chi-home">首页</button>
+          <button class="nav-btn" data-subject="chinese" data-view="chi-learn">知识点</button>
+          <button class="nav-btn" data-subject="chinese" data-view="chi-flashcard">闪卡</button>
+          <button class="nav-btn" data-subject="chinese" data-view="chi-quiz">测验</button>
+          <button class="nav-btn" data-subject="chinese" data-view="chi-play">趣味互动</button>
+        </nav>
+
+        <div class="progress-badge" id="scienceProgress">
           <span class="progress-label">学习进度</span>
           <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
           <span class="progress-text" id="progressText">0%</span>
+        </div>
+        <div class="progress-badge hidden" id="englishProgress">
+          <span class="progress-label">学习进度</span>
+          <div class="progress-bar"><div class="progress-fill" id="engProgressFill"></div></div>
+          <span class="progress-text" id="engProgressText">0%</span>
+        </div>
+        <div class="progress-badge hidden" id="mathProgress">
+          <span class="progress-label">学习进度</span>
+          <div class="progress-bar"><div class="progress-fill" id="mathProgressFill"></div></div>
+          <span class="progress-text" id="mathProgressText">0%</span>
+        </div>
+        <div class="progress-badge hidden" id="chineseProgress">
+          <span class="progress-label">学习进度</span>
+          <div class="progress-bar"><div class="progress-fill" id="chiProgressFill"></div></div>
+          <span class="progress-text" id="chiProgressText">0%</span>
         </div>
       </div>
     </header>
 
     <main class="main">
-      <!-- 首页 -->
-      <section class="view active" id="view-home">
+      <!-- ═══ 科学 ═══ -->
+      <section class="view active" id="view-home" data-subject="science">
         <div class="hero">
           <h2>欢迎来复习科学！</h2>
           <p>本课件涵盖四个单元共 26 个知识点，支持阅读、闪卡记忆、选择题测验和趣味互动。</p>
@@ -46,8 +91,7 @@
         <div class="stats-row" id="statsRow"></div>
       </section>
 
-      <!-- 知识点 -->
-      <section class="view" id="view-learn">
+      <section class="view" id="view-learn" data-subject="science">
         <div class="view-toolbar">
           <select id="learnUnitSelect" class="select"></select>
           <input type="search" id="learnSearch" class="search" placeholder="搜索知识点…">
@@ -55,8 +99,7 @@
         <div class="topic-list" id="topicList"></div>
       </section>
 
-      <!-- 闪卡 -->
-      <section class="view" id="view-flashcard">
+      <section class="view" id="view-flashcard" data-subject="science">
         <div class="view-toolbar">
           <select id="flashUnitSelect" class="select"></select>
           <span class="flash-counter" id="flashCounter">1 / 1</span>
@@ -82,8 +125,7 @@
         </div>
       </section>
 
-      <!-- 测验 -->
-      <section class="view" id="view-quiz">
+      <section class="view" id="view-quiz" data-subject="science">
         <div id="quizSetup" class="quiz-setup">
           <h2>选择测验范围</h2>
           <div class="quiz-options" id="quizOptions"></div>
@@ -113,14 +155,12 @@
         </div>
       </section>
 
-      <!-- 趣味互动 -->
-      <section class="view" id="view-play">
+      <section class="view" id="view-play" data-subject="science">
         <div class="play-tabs">
           <button class="play-tab active" data-play="timeline">🚢 船的历史</button>
           <button class="play-tab" data-play="foodchain">🌿 食物链</button>
           <button class="play-tab" data-play="concept">💡 概念闯关</button>
         </div>
-
         <div class="play-panel active" id="play-timeline">
           <div class="play-card">
             <h3 class="play-card-title">🚢 排出船的发展顺序</h3>
@@ -134,11 +174,10 @@
             <div class="play-feedback" id="timelineFeedback"></div>
           </div>
         </div>
-
         <div class="play-panel" id="play-foodchain">
           <div class="play-card">
             <h3 class="play-card-title">🌿 排出食物链顺序</h3>
-            <p class="play-card-desc" id="chainScenario">从<strong>生产者</strong>到<strong>顶级消费者</strong>，每一行选一种生物</p>
+            <p class="play-card-desc" id="chainScenario">从生产者到顶级消费者</p>
             <div class="pick-list" id="chainRows"></div>
             <div class="play-actions">
               <button class="btn btn-primary btn-lg" id="checkChain">✓ 检查答案</button>
@@ -148,7 +187,6 @@
             <div class="play-feedback" id="chainFeedback"></div>
           </div>
         </div>
-
         <div class="play-panel" id="play-concept">
           <div class="play-card">
             <div class="mini-quiz-head">
@@ -165,14 +203,406 @@
           </div>
         </div>
       </section>
+
+      <!-- ═══ 英语 ═══ -->
+      <section class="view" id="view-eng-home" data-subject="english">
+        <div class="hero hero-english">
+          <h2 id="engHeroTitle">欢迎来复习英语！</h2>
+          <p id="engExamTitle"></p>
+          <p class="exam-note" id="engExamNote"></p>
+        </div>
+        <div class="unit-grid" id="engUnitGrid"></div>
+        <div class="stats-row" id="engStatsRow"></div>
+      </section>
+
+      <section class="view" id="view-eng-learn" data-subject="english">
+        <div class="view-toolbar">
+          <select id="engLearnUnitSelect" class="select"></select>
+          <input type="search" id="engLearnSearch" class="search" placeholder="搜索知识点…">
+        </div>
+        <div class="topic-list" id="engTopicList"></div>
+      </section>
+
+      <section class="view" id="view-eng-flashcard" data-subject="english">
+        <div class="view-toolbar">
+          <select id="engFlashUnitSelect" class="select"></select>
+          <span class="flash-counter" id="engFlashCounter">1 / 1</span>
+        </div>
+        <div class="flashcard-area">
+          <div class="flashcard flashcard-eng" id="engFlashcard">
+            <div class="flashcard-inner">
+              <div class="flashcard-front">
+                <span class="flash-tag" id="engFlashTag">单元</span>
+                <h3 id="engFlashQuestion">问题</h3>
+                <p class="flash-hint">点击卡片查看答案</p>
+              </div>
+              <div class="flashcard-back">
+                <p id="engFlashAnswer">答案</p>
+              </div>
+            </div>
+          </div>
+          <div class="flash-controls">
+            <button class="btn btn-secondary" id="engFlashPrev">← 上一张</button>
+            <button class="btn btn-primary" id="engFlashKnow">我会了 ✓</button>
+            <button class="btn btn-secondary" id="engFlashNext">下一张 →</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-eng-quiz" data-subject="english">
+        <div id="engQuizSetup" class="quiz-setup">
+          <h2>选择测验范围</h2>
+          <div class="quiz-options" id="engQuizOptions"></div>
+          <button class="btn btn-primary btn-lg" id="startEngQuiz">开始测验</button>
+        </div>
+        <div id="engQuizActive" class="quiz-active hidden">
+          <div class="quiz-header">
+            <span id="engQuizProgress">第 1 / 10 题</span>
+            <span id="engQuizScore">得分：0</span>
+          </div>
+          <div class="quiz-question" id="engQuizQuestion"></div>
+          <div class="quiz-choices" id="engQuizChoices"></div>
+          <div class="quiz-feedback hidden" id="engQuizFeedback"></div>
+          <button class="btn btn-primary hidden" id="engQuizNext">下一题</button>
+        </div>
+        <div id="engQuizResult" class="quiz-result hidden">
+          <div class="result-card">
+            <div class="result-emoji" id="engResultEmoji">🎉</div>
+            <h2 id="engResultTitle">测验完成！</h2>
+            <p class="result-score" id="engResultScore">10 / 10</p>
+            <p id="engResultMessage"></p>
+            <div class="result-actions">
+              <button class="btn btn-primary" id="retryEngQuiz">再测一次</button>
+              <button class="btn btn-secondary" id="reviewEngWrong">复习错题</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-eng-play" data-subject="english">
+        <div class="play-tabs">
+          <button class="play-tab active" data-play="vocab">📝 词汇闯关</button>
+          <button class="play-tab" data-play="dialogue">💬 对话填空</button>
+          <button class="play-tab" data-play="reading">📖 阅读练习</button>
+          <button class="play-tab" data-play="writing">✍️ 写作参考</button>
+        </div>
+
+        <div class="play-panel active" id="eng-play-vocab">
+          <div class="play-card">
+            <p class="play-card-desc">学完知识点后来这里练手：填空后点「检查」看对错</p>
+            <div id="engPlayVocab"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="eng-play-dialogue">
+          <div class="play-card">
+            <h3 class="play-card-title">Nancy 谈论元宵节</h3>
+            <p class="play-card-desc">每一空从下拉框选合适的句子</p>
+            <div class="dialogue-box" id="engDialogueLines"></div>
+            <div class="play-actions">
+              <button type="button" class="btn btn-primary btn-lg" id="checkEngDialogue">✓ 检查答案</button>
+            </div>
+            <div class="play-feedback" id="engDialogueFeedback"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="eng-play-reading">
+          <div class="play-tabs read-tabs" style="margin-bottom:1rem">
+            <button type="button" class="read-tab play-tab active" data-read="myopia">👓 近视</button>
+            <button type="button" class="read-tab play-tab" data-read="tea">🍵 茶文化</button>
+          </div>
+          <div class="read-panel active" id="read-play-myopia">
+            <pre class="read-passage" id="engPlayMyopiaPassage"></pre>
+            <div id="engPlayMyopiaQ"></div>
+            <button type="button" class="btn btn-secondary" id="checkMyopiaFillBtn">检查填空题</button>
+          </div>
+          <div class="read-panel" id="read-play-tea">
+            <pre class="read-passage" id="engPlayTeaPassage"></pre>
+            <p class="play-card-desc">T = 正确，F = 错误</p>
+            <div id="engPlayTeaQ"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="eng-play-writing">
+          <div class="play-card">
+            <h3 class="play-card-title">书面表达</h3>
+            <p class="play-card-desc" id="engPlayWritingPrompt"></p>
+            <div class="writing-template">
+              <strong>句型：</strong><p id="engPlayWritingTemplate"></p>
+            </div>
+            <h4 class="writing-subtitle">例句</h4>
+            <div id="engPlayWritingExamples"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 数学 ═══ -->
+      <section class="view" id="view-math-home" data-subject="math">
+        <div class="hero hero-math">
+          <h2 id="mathHeroTitle">欢迎来复习数学！</h2>
+          <p id="mathExamTitle"></p>
+          <p class="exam-note" id="mathExamNote"></p>
+        </div>
+        <div class="unit-grid" id="mathUnitGrid"></div>
+        <div class="stats-row" id="mathStatsRow"></div>
+        <div class="math-exam-sections" id="mathExamSections"></div>
+        <div class="math-sources-block">
+          <h3 class="section-title">📚 参考试卷（12 份）</h3>
+          <div class="math-sources-grid" id="mathSourcesGrid"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-math-learn" data-subject="math">
+        <div class="view-toolbar">
+          <select id="mathLearnUnitSelect" class="select"></select>
+          <input type="search" id="mathLearnSearch" class="search" placeholder="搜索知识点…">
+        </div>
+        <div class="topic-list" id="mathTopicList"></div>
+      </section>
+
+      <section class="view" id="view-math-flashcard" data-subject="math">
+        <div class="view-toolbar">
+          <select id="mathFlashUnitSelect" class="select"></select>
+          <span class="flash-counter" id="mathFlashCounter">1 / 1</span>
+        </div>
+        <div class="flashcard-area">
+          <div class="flashcard flashcard-math" id="mathFlashcard">
+            <div class="flashcard-inner">
+              <div class="flashcard-front">
+                <span class="flash-tag" id="mathFlashTag">单元</span>
+                <h3 id="mathFlashQuestion">问题</h3>
+                <p class="flash-hint">点击卡片查看答案</p>
+              </div>
+              <div class="flashcard-back">
+                <p id="mathFlashAnswer">答案</p>
+              </div>
+            </div>
+          </div>
+          <div class="flash-controls">
+            <button class="btn btn-secondary" id="mathFlashPrev">← 上一张</button>
+            <button class="btn btn-primary" id="mathFlashKnow">我会了 ✓</button>
+            <button class="btn btn-secondary" id="mathFlashNext">下一张 →</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-math-quiz" data-subject="math">
+        <div id="mathQuizSetup" class="quiz-setup">
+          <h2>选择测验范围</h2>
+          <p class="quiz-hint">题型贴近苏州期末卷：选择、判断、填空、计算（每次 15 题）</p>
+          <div class="quiz-options" id="mathQuizOptions"></div>
+          <button class="btn btn-primary btn-lg" id="startMathQuiz">开始测验</button>
+        </div>
+        <div id="mathQuizActive" class="quiz-active hidden">
+          <div class="quiz-header">
+            <span id="mathQuizProgress">第 1 / 10 题</span>
+            <span id="mathQuizScore">得分：0</span>
+          </div>
+          <div class="quiz-question" id="mathQuizQuestion"></div>
+          <div class="quiz-choices" id="mathQuizChoices"></div>
+          <div class="quiz-feedback hidden" id="mathQuizFeedback"></div>
+          <button class="btn btn-primary hidden" id="mathQuizNext">下一题</button>
+        </div>
+        <div id="mathQuizResult" class="quiz-result hidden">
+          <div class="result-card">
+            <div class="result-emoji" id="mathResultEmoji">🎉</div>
+            <h2 id="mathResultTitle">测验完成！</h2>
+            <p class="result-score" id="mathResultScore">10 / 10</p>
+            <p id="mathResultMessage"></p>
+            <div class="result-actions">
+              <button class="btn btn-primary" id="retryMathQuiz">再测一次</button>
+              <button class="btn btn-secondary" id="reviewMathWrong">复习错题</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-math-play" data-subject="math">
+        <div class="play-tabs">
+          <button class="play-tab active" data-play="fill">📝 填空闯关</button>
+          <button class="play-tab" data-play="judge">⚖️ 判断题</button>
+          <button class="play-tab" data-play="calc">🔢 计算方程</button>
+          <button class="play-tab" data-play="word">📋 应用题思路</button>
+          <button class="play-tab" data-play="pick">⭐ 卷面精选</button>
+        </div>
+
+        <div class="play-panel active" id="math-play-fill">
+          <div class="play-card">
+            <p class="play-card-desc">期末卷常考概念与公式，填完点「检查填空」</p>
+            <div id="mathPlayFill"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="math-play-judge">
+          <div class="play-card">
+            <p class="play-card-desc">苏州卷判断题风格：选「正确」或「错误」</p>
+            <div id="mathPlayJudge"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="math-play-calc">
+          <div class="play-card">
+            <p class="play-card-desc">计算题 + 解方程（答案填数字或分数如 11/20）</p>
+            <div id="mathPlayCalc"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="math-play-word">
+          <div class="play-card">
+            <p class="play-card-desc">按苏教 8 单元整理：32 道应用题思路 + 8 种解题方法（来自 12 份苏州卷）</p>
+            <div id="mathPlayWord"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="math-play-pick">
+          <div class="play-card">
+            <p class="play-card-desc">48 道典型选择题：因数倍数、分数、圆、方程、统计、综合应用</p>
+            <div id="mathPlayPick"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 语文 ═══ -->
+      <section class="view" id="view-chi-home" data-subject="chinese">
+        <div class="hero hero-chinese">
+          <h2 id="chiHeroTitle">欢迎来复习语文！</h2>
+          <p id="chiExamTitle"></p>
+          <p class="exam-note" id="chiExamNote"></p>
+        </div>
+        <div class="unit-grid" id="chiUnitGrid"></div>
+        <div class="stats-row" id="chiStatsRow"></div>
+        <div class="chi-exam-sections" id="chiExamSections"></div>
+        <div class="chi-sources-block">
+          <h3 class="section-title chi-section-title">📚 参考试卷（21 份）</h3>
+          <div class="chi-sources-grid" id="chiSourcesGrid"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-chi-learn" data-subject="chinese">
+        <div class="view-toolbar">
+          <select id="chiLearnUnitSelect" class="select"></select>
+          <input type="search" id="chiLearnSearch" class="search" placeholder="搜索知识点…">
+        </div>
+        <div class="topic-list" id="chiTopicList"></div>
+      </section>
+
+      <section class="view" id="view-chi-flashcard" data-subject="chinese">
+        <div class="view-toolbar">
+          <select id="chiFlashUnitSelect" class="select"></select>
+          <span class="flash-counter" id="chiFlashCounter">1 / 1</span>
+        </div>
+        <div class="flashcard-area">
+          <div class="flashcard flashcard-chi" id="chiFlashcard">
+            <div class="flashcard-inner">
+              <div class="flashcard-front">
+                <span class="flash-tag" id="chiFlashTag">单元</span>
+                <h3 id="chiFlashQuestion">问题</h3>
+                <p class="flash-hint">点击卡片查看答案</p>
+              </div>
+              <div class="flashcard-back">
+                <p id="chiFlashAnswer">答案</p>
+              </div>
+            </div>
+          </div>
+          <div class="flash-controls">
+            <button class="btn btn-secondary" id="chiFlashPrev">← 上一张</button>
+            <button class="btn btn-primary" id="chiFlashKnow">我会了 ✓</button>
+            <button class="btn btn-secondary" id="chiFlashNext">下一张 →</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-chi-quiz" data-subject="chinese">
+        <div id="chiQuizSetup" class="quiz-setup">
+          <h2>选择测验范围</h2>
+          <p class="quiz-hint">题型贴近苏州期末卷：选择、判断、填空、默写、阅读（每次 15 题）</p>
+          <div class="quiz-options" id="chiQuizOptions"></div>
+          <button class="btn btn-primary btn-lg" id="startChiQuiz">开始测验</button>
+        </div>
+        <div id="chiQuizActive" class="quiz-active hidden">
+          <div class="quiz-header">
+            <span id="chiQuizProgress">第 1 / 10 题</span>
+            <span id="chiQuizScore">得分：0</span>
+          </div>
+          <div class="quiz-question" id="chiQuizQuestion"></div>
+          <div class="quiz-choices" id="chiQuizChoices"></div>
+          <div class="quiz-feedback hidden" id="chiQuizFeedback"></div>
+          <button class="btn btn-primary hidden" id="chiQuizNext">下一题</button>
+        </div>
+        <div id="chiQuizResult" class="quiz-result hidden">
+          <div class="result-card">
+            <div class="result-emoji" id="chiResultEmoji">🎉</div>
+            <h2 id="chiResultTitle">测验完成！</h2>
+            <p class="result-score" id="chiResultScore">10 / 10</p>
+            <p id="chiResultMessage"></p>
+            <div class="result-actions">
+              <button class="btn btn-primary" id="retryChiQuiz">再测一次</button>
+              <button class="btn btn-secondary" id="reviewChiWrong">复习错题</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-chi-play" data-subject="chinese">
+        <div class="play-tabs">
+          <button class="play-tab active" data-play="fill">📝 填空闯关</button>
+          <button class="play-tab" data-play="judge">⚖️ 判断题</button>
+          <button class="play-tab" data-play="poetry">📜 诗词名句</button>
+          <button class="play-tab" data-play="word">✍️ 阅读习作思路</button>
+          <button class="play-tab" data-play="pick">⭐ 卷面精选</button>
+        </div>
+
+        <div class="play-panel active" id="chi-play-fill">
+          <div class="play-card">
+            <p class="play-card-desc">期末卷常考字词、成语、文学常识，填完点「检查填空」</p>
+            <div id="chiPlayFill"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="chi-play-judge">
+          <div class="play-card">
+            <p class="play-card-desc">苏州卷判断题风格：选「正确」或「错误」</p>
+            <div id="chiPlayJudge"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="chi-play-poetry">
+          <div class="play-card">
+            <p class="play-card-desc">课内诗词名句默写，填完点「检查默写」</p>
+            <div id="chiPlayPoetry"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="chi-play-word">
+          <div class="play-card">
+            <p class="play-card-desc">按统编五下 8 单元整理：23 篇课内阅读 + 6 篇习作 + 8 种答题方法 + 综合活动</p>
+            <div id="chiPlayWord"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="chi-play-pick">
+          <div class="play-card">
+            <p class="play-card-desc">48 道典型选择题：课文理解、阅读方法、习作要点（来自 21 份苏州卷）</p>
+            <div id="chiPlayPick"></div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer class="footer">
-      <p>教科版五年级下册科学 · 知识点复习课件</p>
+      <p id="footerText">康煜承 · 五年级复习课件</p>
     </footer>
   </div>
 
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/english-data.js"></script>
+  <script src="js/english-app.js"></script>
+  <script src="js/math-data.js"></script>
+  <script src="js/math-papers.js"></script>
+  <script src="js/math-app.js"></script>
+  <script src="js/chinese-data.js"></script>
+  <script src="js/chinese-papers.js"></script>
+  <script src="js/chinese-app.js"></script>
 </body>
 </html>

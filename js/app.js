@@ -45,8 +45,64 @@
     state.currentView = view;
     $$('.view').forEach(v => v.classList.remove('active'));
     $$('.nav-btn').forEach(b => b.classList.remove('active'));
-    $(`#view-${view}`).classList.add('active');
-    $(`.nav-btn[data-view="${view}"]`).classList.add('active');
+    const viewEl = $(`#view-${view}`);
+    if (viewEl) viewEl.classList.add('active');
+    $$(`.nav-btn[data-view="${view}"]`).forEach(b => b.classList.add('active'));
+  }
+
+  /* ── Subject switcher ── */
+  let currentSubject = 'science';
+
+  function switchSubject(subject) {
+    currentSubject = subject;
+    $$('.subject-btn').forEach(b => b.classList.toggle('active', b.dataset.subject === subject));
+
+    $('#scienceNav').classList.toggle('hidden', subject !== 'science');
+    $('#englishNav').classList.toggle('hidden', subject !== 'english');
+    $('#mathNav').classList.toggle('hidden', subject !== 'math');
+    $('#chineseNav').classList.toggle('hidden', subject !== 'chinese');
+    $('#scienceProgress').classList.toggle('hidden', subject !== 'science');
+    $('#englishProgress').classList.toggle('hidden', subject !== 'english');
+    $('#mathProgress').classList.toggle('hidden', subject !== 'math');
+    $('#chineseProgress').classList.toggle('hidden', subject !== 'chinese');
+
+    if (subject === 'science') {
+      $('#logoIcon').textContent = '🔬';
+      $('#siteTitle').textContent = '五年级下册科学';
+      $('#siteSubtitle').textContent = '教科版 · 互动复习课件';
+      const v = state.currentView || 'home';
+      switchView(v.startsWith('eng') || v.startsWith('math') || v.startsWith('chi') ? 'home' : v);
+    } else if (subject === 'english') {
+      $('#logoIcon').textContent = '📘';
+      $('#siteTitle').textContent = '五年级下册英语';
+      $('#siteSubtitle').textContent = '南京卷期末模拟 · 笔试练习';
+      switchView('eng-home');
+    } else if (subject === 'math') {
+      $('#logoIcon').textContent = '📐';
+      $('#siteTitle').textContent = '五年级下册数学';
+      $('#siteSubtitle').textContent = '苏州期末卷 · 苏教版互动复习';
+      switchView('math-home');
+    } else if (subject === 'chinese') {
+      $('#logoIcon').textContent = '📖';
+      $('#siteTitle').textContent = '五年级下册语文';
+      $('#siteSubtitle').textContent = '苏州期末卷 · 互动复习';
+      switchView('chi-home');
+    }
+
+    $$('.view').forEach(v => {
+      if (v.dataset.subject && v.dataset.subject !== subject) v.classList.remove('active');
+    });
+  }
+
+  window.switchSubjectView = function (subject, view) {
+    switchSubject(subject);
+    switchView(view);
+  };
+
+  function initSubjectSwitcher() {
+    $$('.subject-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchSubject(btn.dataset.subject));
+    });
   }
 
   function updateProgressUI() {
@@ -611,13 +667,18 @@
   /* ── Nav ── */
   function initNav() {
     $$('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchView(btn.dataset.view));
+      btn.addEventListener('click', () => {
+        const sub = btn.dataset.subject;
+        if (sub && sub !== currentSubject) switchSubject(sub);
+        switchView(btn.dataset.view);
+      });
     });
   }
 
   /* ── Init ── */
   function init() {
     loadProgress();
+    initSubjectSwitcher();
     initNav();
     initLearnSelect();
     initFlashSelect();
@@ -631,6 +692,9 @@
     renderTopics();
     renderFlashcard();
     updateProgressUI();
+    if (window.initEnglish) window.initEnglish();
+    if (window.initMath) window.initMath();
+    if (window.initChinese) window.initChinese();
   }
 
   document.addEventListener('DOMContentLoaded', init);
