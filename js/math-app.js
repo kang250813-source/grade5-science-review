@@ -216,15 +216,24 @@
   }
 
   /* ── 闪卡 ── */
+  let mathFlashSelectBound = false;
+  let mathFlashControlsBound = false;
+
   function initMathFlashSelect() {
     const sel = $('#mathFlashUnitSelect');
     sel.innerHTML = '<option value="all">全部单元</option>' +
       MATH_UNITS.map((u, i) => `<option value="${i}">第${i + 1}单元</option>`).join('');
-    sel.addEventListener('change', () => {
-      mathState.flashUnit = sel.value;
-      mathState.flashIndex = 0;
-      renderMathFlashcard();
-    });
+    mathState.flashUnit = 'all';
+    mathState.flashIndex = 0;
+    sel.value = 'all';
+    if (!mathFlashSelectBound) {
+      mathFlashSelectBound = true;
+      sel.addEventListener('change', () => {
+        mathState.flashUnit = sel.value;
+        mathState.flashIndex = 0;
+        renderMathFlashcard();
+      });
+    }
   }
 
   function getFilteredMathFlash() {
@@ -238,12 +247,20 @@
 
   function renderMathFlashcard() {
     const cards = getFilteredMathFlash();
-    if (!cards.length) return;
+    const cardEl = $('#mathFlashcard');
+    if (!cards.length) {
+      cardEl.classList.remove('flipped', 'flashcard-has-viz');
+      $('#mathFlashTag').textContent = '暂无闪卡';
+      $('#mathFlashQuestion').textContent = '该单元暂无闪卡，请切换单元';
+      $('#mathFlashAnswer').innerHTML = '<p class="flash-answer-text">—</p>';
+      $('#mathFlashCounter').textContent = '0 / 0';
+      return;
+    }
     if (mathState.flashIndex >= cards.length) mathState.flashIndex = 0;
     const card = cards[mathState.flashIndex];
-    const cardEl = $('#mathFlashcard');
     cardEl.classList.remove('flipped');
-    $('#mathFlashTag').textContent = MATH_UNITS[card.unit].title;
+    const unitTitle = MATH_UNITS[card.unit] ? MATH_UNITS[card.unit].title : `第${card.unit + 1}单元`;
+    $('#mathFlashTag').textContent = unitTitle;
     $('#mathFlashQuestion').textContent = card.q + (card.viz ? ' 📊' : '');
     const ansEl = $('#mathFlashAnswer');
     if (card.viz && typeof renderMathFlashViz === 'function') {
@@ -257,6 +274,8 @@
   }
 
   function setupMathFlashControls() {
+    if (mathFlashControlsBound) return;
+    mathFlashControlsBound = true;
     $('#mathFlashcard').addEventListener('click', () => {
       $('#mathFlashcard').classList.toggle('flipped');
     });
@@ -576,4 +595,5 @@
   }
 
   window.initMath = initMath;
+  window.refreshMathFlashcard = renderMathFlashcard;
 })();

@@ -598,4 +598,5 @@
   }
 
   window.initChinese = initChinese;
+  window.refreshChiFlashcard = renderChiFlashcard;
 })();

@@ -915,7 +915,10 @@ body.study-mode .header { padding-bottom: 0.85rem; }
   max-width: 520px;
   height: 280px;
   perspective: 1000px;
+  -webkit-perspective: 1000px;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .flashcard-inner {
@@ -923,15 +926,21 @@ body.study-mode .header { padding-bottom: 0.85rem; }
   height: 100%;
   position: relative;
   transition: transform 0.5s;
+  -webkit-transition: -webkit-transform 0.5s;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
-.flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+.flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+}
 
 .flashcard-front, .flashcard-back {
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   border-radius: var(--radius);
   display: flex;
   flex-direction: column;
@@ -940,17 +949,19 @@ body.study-mode .header { padding-bottom: 0.85rem; }
   padding: 2rem;
   text-align: center;
   box-shadow: var(--shadow-lg);
-}
-
-.flashcard-front {
-  background: linear-gradient(145deg, #1e40af, #3b82f6);
-  color: white;
+  pointer-events: none;
 }
 
 .flashcard-back {
   background: var(--surface);
   transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
   border: 3px solid var(--primary);
+}
+
+.flashcard-front {
+  background: linear-gradient(145deg, #1e40af, #3b82f6);
+  color: white;
 }
 
 .flash-tag {

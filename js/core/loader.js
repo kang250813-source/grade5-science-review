@@ -14,8 +14,12 @@
         resolve();
         return;
       }
+      const root = (typeof APP_BASE === 'string' ? APP_BASE : '/');
+      const url = (src.startsWith('http') || src.startsWith('/'))
+        ? src
+        : root.replace(/\/?$/, '/') + src.replace(/^\//, '');
       const s = document.createElement('script');
-      s.src = src + (src.includes('?') ? '&' : '?') + 'v=' + ASSET_VERSION;
+      s.src = url + (url.includes('?') ? '&' : '?') + 'v=' + ASSET_VERSION;
       s.async = false;
       s.dataset.gradeSrc = src;
       s.onload = () => resolve();

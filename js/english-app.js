@@ -210,15 +210,24 @@
   }
 
   /* ── 闪卡 ── */
+  let engFlashSelectBound = false;
+  let engFlashControlsBound = false;
+
   function initEngFlashSelect() {
     const sel = $('#engFlashUnitSelect');
     sel.innerHTML = '<option value="all">全部单元</option>' +
       ENG_UNITS.map((u, i) => `<option value="${i}">第${i + 1}单元</option>`).join('');
-    sel.addEventListener('change', () => {
-      engState.flashUnit = sel.value;
-      engState.flashIndex = 0;
-      renderEngFlashcard();
-    });
+    engState.flashUnit = 'all';
+    engState.flashIndex = 0;
+    sel.value = 'all';
+    if (!engFlashSelectBound) {
+      engFlashSelectBound = true;
+      sel.addEventListener('change', () => {
+        engState.flashUnit = sel.value;
+        engState.flashIndex = 0;
+        renderEngFlashcard();
+      });
+    }
   }
 
   function getFilteredEngFlash() {
@@ -228,17 +237,28 @@
 
   function renderEngFlashcard() {
     const cards = getFilteredEngFlash();
-    if (!cards.length) return;
+    const cardEl = $('#engFlashcard');
+    if (!cards.length) {
+      cardEl.classList.remove('flipped');
+      $('#engFlashTag').textContent = '暂无闪卡';
+      $('#engFlashQuestion').textContent = '该单元暂无闪卡，请切换单元';
+      $('#engFlashAnswer').textContent = '—';
+      $('#engFlashCounter').textContent = '0 / 0';
+      return;
+    }
     if (engState.flashIndex >= cards.length) engState.flashIndex = 0;
     const card = cards[engState.flashIndex];
-    $('#engFlashcard').classList.remove('flipped');
-    $('#engFlashTag').textContent = ENG_UNITS[card.unit].title;
+    cardEl.classList.remove('flipped');
+    const unitTitle = ENG_UNITS[card.unit] ? ENG_UNITS[card.unit].title : `第${card.unit + 1}单元`;
+    $('#engFlashTag').textContent = unitTitle;
     $('#engFlashQuestion').textContent = card.q;
     $('#engFlashAnswer').textContent = card.a;
     $('#engFlashCounter').textContent = `${engState.flashIndex + 1} / ${cards.length}`;
   }
 
   function setupEngFlashControls() {
+    if (engFlashControlsBound) return;
+    engFlashControlsBound = true;
     $('#engFlashcard').addEventListener('click', () => {
       $('#engFlashcard').classList.toggle('flipped');
     });
@@ -785,4 +805,5 @@
   }
 
   window.initEnglish = initEnglish;
+  window.refreshEngFlashcard = renderEngFlashcard;
 })();

@@ -58,6 +58,10 @@
     $$(`.nav-btn[data-view="${view}"]`).forEach(b => b.classList.add('active'));
     if (view === 'eng-listening' && window.renderEngListening) window.renderEngListening();
     if (view !== 'eng-listening' && window.stopEngListening) window.stopEngListening();
+    if (view === 'flashcard') renderFlashcard();
+    if (view === 'math-flashcard' && window.refreshMathFlashcard) window.refreshMathFlashcard();
+    if (view === 'eng-flashcard' && window.refreshEngFlashcard) window.refreshEngFlashcard();
+    if (view === 'chi-flashcard' && window.refreshChiFlashcard) window.refreshChiFlashcard();
   }
 
   window.switchView = switchView;
@@ -222,15 +226,23 @@
   }
 
   /* ── Flashcards ── */
+  let flashSelectBound = false;
+
   function initFlashSelect() {
     const sel = $('#flashUnitSelect');
     sel.innerHTML = '<option value="all">全部单元</option>' +
       UNITS.map((u, i) => `<option value="${i}">第${i + 1}单元</option>`).join('');
-    sel.addEventListener('change', () => {
-      state.flashUnit = sel.value;
-      state.flashIndex = 0;
-      renderFlashcard();
-    });
+    state.flashUnit = 'all';
+    state.flashIndex = 0;
+    sel.value = 'all';
+    if (!flashSelectBound) {
+      flashSelectBound = true;
+      sel.addEventListener('change', () => {
+        state.flashUnit = sel.value;
+        state.flashIndex = 0;
+        renderFlashcard();
+      });
+    }
   }
 
   function getFilteredFlashcards() {
@@ -240,13 +252,21 @@
 
   function renderFlashcard() {
     const cards = getFilteredFlashcards();
-    if (!cards.length) return;
+    const fc = $('#flashcard');
+    if (!cards.length) {
+      fc.classList.remove('flipped');
+      $('#flashTag').textContent = '暂无闪卡';
+      $('#flashQuestion').textContent = '该单元暂无闪卡，请切换单元';
+      $('#flashAnswer').textContent = '—';
+      $('#flashCounter').textContent = '0 / 0';
+      return;
+    }
     if (state.flashIndex >= cards.length) state.flashIndex = 0;
     const card = cards[state.flashIndex];
-    const fc = $('#flashcard');
     fc.classList.remove('flipped');
 
-    $('#flashTag').textContent = UNITS[card.unit].title;
+    const unitTitle = UNITS[card.unit] ? UNITS[card.unit].title : `第${card.unit + 1}单元`;
+    $('#flashTag').textContent = unitTitle;
     $('#flashQuestion').textContent = card.q;
     $('#flashAnswer').textContent = card.a;
     $('#flashCounter').textContent = `${state.flashIndex + 1} / ${cards.length}`;
@@ -769,8 +789,6 @@
     if (!window._scienceUiReady) {
       initSubjectSwitcher();
       initNav();
-      initLearnSelect();
-      initFlashSelect();
       setupFlashControls();
       initQuizSetup();
       initTimeline();
@@ -779,6 +797,8 @@
       initPlayTabs();
       window._scienceUiReady = true;
     }
+    initLearnSelect();
+    initFlashSelect();
     renderHome();
     renderTopics();
     renderFlashcard();
@@ -786,5 +806,6 @@
   }
 
   window.initScience = initScience;
+  window.refreshScienceFlashcard = renderFlashcard;
 
 })();

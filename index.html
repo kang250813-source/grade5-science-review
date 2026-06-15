@@ -4,7 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>小学复习课件</title>
-  <link rel="stylesheet" href="css/style.css?v=20260615-grade-theme">
+  <script>
+    (function () {
+      var path = location.pathname;
+      var repo = '/grade5-science-review';
+      var i = path.indexOf(repo);
+      var base = i >= 0
+        ? path.slice(0, i + repo.length + 1)
+        : (path.endsWith('/') ? path : path.replace(/[^/]+$/, '') || '/');
+      window.APP_BASE = base;
+      var el = document.createElement('base');
+      el.href = base;
+      document.head.appendChild(el);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css?v=20260615-flash-fix">
 </head>
 <body>
   <div class="app">
@@ -678,13 +692,13 @@
   <script src="js/core/schema.js?v=20260615-g3full"></script>
   <script src="js/core/registry.js?v=20260615b"></script>
   <script src="js/core/progress.js?v=20260615b"></script>
-  <script src="js/core/loader.js?v=20260615b"></script>
+  <script src="js/core/loader.js?v=20260615-flash-fix"></script>
   <script src="js/core/shell.js?v=20260615-g6fix"></script>
   <script src="js/core/portal.js?v=20260615b"></script>
-  <script src="js/app.js"></script>
-  <script src="js/english-app.js?v=20260615-g6fix"></script>
-  <script src="js/math-app.js"></script>
-  <script src="js/chinese-app.js?v=20260615-chi-flash"></script>
+  <script src="js/app.js?v=20260615-flash-fix"></script>
+  <script src="js/english-app.js?v=20260615-flash-fix"></script>
+  <script src="js/math-app.js?v=20260615-flash-fix"></script>
+  <script src="js/chinese-app.js?v=20260615-flash-fix"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       Shell.bootstrap();
