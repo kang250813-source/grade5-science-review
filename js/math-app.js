@@ -224,15 +224,27 @@
     return MATH_FLASHCARDS.filter(c => c.unit === +mathState.flashUnit);
   }
 
+  function escapeHtml(s) {
+    return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
   function renderMathFlashcard() {
     const cards = getFilteredMathFlash();
     if (!cards.length) return;
     if (mathState.flashIndex >= cards.length) mathState.flashIndex = 0;
     const card = cards[mathState.flashIndex];
-    $('#mathFlashcard').classList.remove('flipped');
+    const cardEl = $('#mathFlashcard');
+    cardEl.classList.remove('flipped');
     $('#mathFlashTag').textContent = MATH_UNITS[card.unit].title;
-    $('#mathFlashQuestion').textContent = card.q;
-    $('#mathFlashAnswer').textContent = card.a;
+    $('#mathFlashQuestion').textContent = card.q + (card.viz ? ' 📊' : '');
+    const ansEl = $('#mathFlashAnswer');
+    if (card.viz && typeof renderMathFlashViz === 'function') {
+      ansEl.innerHTML = `<p class="flash-answer-text">${escapeHtml(card.a)}</p><div class="flash-viz">${renderMathFlashViz(card.viz, card.vizData)}</div>`;
+      cardEl.classList.add('flashcard-has-viz');
+    } else {
+      ansEl.innerHTML = `<p class="flash-answer-text">${escapeHtml(card.a)}</p>`;
+      cardEl.classList.remove('flashcard-has-viz');
+    }
     $('#mathFlashCounter').textContent = `${mathState.flashIndex + 1} / ${cards.length}`;
   }
 
@@ -527,34 +539,13 @@
   }
 
   function renderMathPlayPick() {
-    if (typeof MATH_PAPER_PICKS === 'undefined') return;
-    $('#mathPlayPick').innerHTML = MATH_PAPER_PICKS.map((item, i) => `
-      <div class="read-item pick-item" data-id="${item.id}">
-        <span class="paper-tag">${item.paper}</span>
-        <p>${i + 1}. ${item.q}</p>
-        <div class="read-opts">
-          ${item.options.map((o, j) =>
-            `<button type="button" class="read-opt pick-opt" data-i="${i}" data-j="${j}">${String.fromCharCode(65 + j)}. ${o}</button>`
-          ).join('')}
-        </div>
-        <div class="read-result hidden"></div>
-      </div>`).join('');
-
-    $$('#mathPlayPick .pick-opt').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const qi = +btn.dataset.i, sel = +btn.dataset.j;
-        const q = MATH_PAPER_PICKS[qi];
-        const item = btn.closest('.pick-item');
-        item.querySelectorAll('.pick-opt').forEach((b, j) => {
-          b.disabled = true;
-          b.classList.toggle('correct', j === q.answer);
-          b.classList.toggle('wrong', j === sel && sel !== q.answer);
-        });
-        const r = item.querySelector('.read-result');
-        r.classList.remove('hidden');
-        r.className = 'read-result ' + (sel === q.answer ? 'success' : 'error');
-        r.textContent = (sel === q.answer ? '✓ ' : '✗ ') + q.explain;
-      });
+    if (typeof MATH_PAPER_PICKS === 'undefined' || !window.renderPaperPicks) return;
+    window.renderPaperPicks({
+      listId: '#mathPlayPick',
+      pagerId: '#mathPlayPickPager',
+      picks: MATH_PAPER_PICKS,
+      pageSize: 10,
+      key: 'math-pick'
     });
   }
 

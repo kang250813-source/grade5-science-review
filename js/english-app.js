@@ -12,7 +12,9 @@
     quizIndex: 0,
     quizScore: 0,
     quizWrong: [],
-    selectedQuizUnits: ['all']
+    selectedQuizUnits: ['all'],
+    listenIndex: 0,
+    listenPlaying: false
   };
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -92,7 +94,38 @@
       <div class="stat-card"><div class="stat-num">${ENG_UNITS.length}</div><div class="stat-label">单元</div></div>
       <div class="stat-card"><div class="stat-num">${getEngAllTopicIds().length}</div><div class="stat-label">知识点</div></div>
       <div class="stat-card"><div class="stat-num">${getEngTotalPoints()}</div><div class="stat-label">要点</div></div>
-      <div class="stat-card"><div class="stat-num">${ENG_QUIZ_QUESTIONS.length}</div><div class="stat-label">测验题</div></div>`;
+      <div class="stat-card"><div class="stat-num">${typeof ENG_SOURCES !== 'undefined' ? ENG_SOURCES.length : 1}</div><div class="stat-label">参考试卷</div></div>`;
+
+    if (typeof ENG_EXAM_SECTIONS !== 'undefined') {
+      $('#engExamSections').innerHTML = `
+        <h3 class="section-title eng-section-title">📋 试卷题型结构</h3>
+        <div class="exam-sections-row">
+          ${ENG_EXAM_SECTIONS.map(s => `
+            <div class="exam-section-card eng-exam-card">
+              <span class="exam-section-icon">${s.icon}</span>
+              <strong>${s.title}</strong>
+              <p>${s.desc}</p>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    if (typeof ENG_SOURCES !== 'undefined') {
+      $('#engSourcesGrid').innerHTML = ENG_SOURCES.map(s =>
+        `<span class="paper-chip eng-paper-chip" title="${s.name}">${s.region} · ${s.name.slice(0, 20)}</span>`
+      ).join('');
+    }
+
+    if (typeof ENG_COMMON_MISTAKES !== 'undefined') {
+      $('#engMistakesBlock').innerHTML = `
+        <h3 class="section-title eng-section-title">⚠️ 单元易错点（亮点给力汇总）</h3>
+        <div class="eng-mistakes-grid">
+          ${ENG_COMMON_MISTAKES.map(m => `
+            <div class="eng-mistake-card">
+              <strong>Unit ${m.unit} · ${m.topic}</strong>
+              <p>${m.tip}</p>
+            </div>`).join('')}
+        </div>`;
+    }
   }
 
   /* ── 知识点 ── */
@@ -116,6 +149,7 @@
         const text = (topic.title + ' ' + topic.points.join(' ')).toLowerCase();
         if (search && !text.includes(search)) return;
         const done = engState.completedTopics.includes(topic.id);
+        const examples = typeof getEngExamples === 'function' ? getEngExamples(topic.id) : [];
         html += `
           <div class="topic-card" data-id="${topic.id}">
             <div class="topic-header">
@@ -127,6 +161,16 @@
                 <ul class="point-list eng-points">
                   ${topic.points.map(p => `<li>${p}</li>`).join('')}
                 </ul>
+                ${examples.length ? `
+                <div class="topic-examples">
+                  <h4 class="examples-title">📄 卷面例题（亮点给力 + 南京卷）</h4>
+                  ${examples.map(ex => `
+                    <div class="example-item">
+                      <span class="paper-tag">${ex.paper} · ${ex.type}</span>
+                      <p class="example-q">${ex.q}</p>
+                      <p class="example-a">→ ${ex.a}</p>
+                    </div>`).join('')}
+                </div>` : ''}
                 <div class="topic-actions">
                   <button type="button" class="btn-done ${done ? 'completed' : ''}" data-id="${topic.id}">
                     ${done ? '✓ 已掌握' : '标记为已掌握'}
@@ -258,7 +302,7 @@
 
   function startEngQuiz() {
     const pool = getEngQuizPool();
-    engState.quizQuestions = shuffle(pool).slice(0, Math.min(10, pool.length));
+    engState.quizQuestions = shuffle(pool).slice(0, Math.min(15, pool.length));
     engState.quizIndex = 0;
     engState.quizScore = 0;
     engState.quizWrong = [];
@@ -344,10 +388,89 @@
     $$('#eng-play-reading .read-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         $$('#eng-play-reading .read-tab').forEach(t => t.classList.remove('active'));
-        $$('#read-play-myopia, #read-play-tea').forEach(p => p.classList.remove('active'));
+        $$('#read-play-myopia, #read-play-tea, #read-play-metro, #read-play-transport').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
         $(`#read-play-${tab.dataset.read}`).classList.add('active');
       });
+    });
+  }
+
+  function renderReadingBlock(containerId, data, prefix) {
+    $(`${containerId.replace('Q', 'Passage')}`).textContent = data.passage;
+    $(containerId).innerHTML = data.questions.map((q, i) => {
+      if (q.type === 'fill') {
+        return `<div class="read-item"><p>${i + 1}. ${q.q}</p>
+          <input type="text" class="read-input" id="${prefix}Fill${i}">
+          <div class="read-result hidden" id="${prefix}FillResult${i}"></div></div>`;
+      }
+      if (q.options && q.options[0] && (q.options[0].startsWith('True') || q.options[0].startsWith('False'))) {
+        return `<div class="read-item"><p>${i + 1}. ${q.q}</p>
+          <div class="tf-btns">
+            <button type="button" class="tf-btn" data-i="${i}" data-v="true">T</button>
+            <button type="button" class="tf-btn" data-i="${i}" data-v="false">F</button>
+          </div><div class="read-result hidden"></div></div>`;
+      }
+      return `<div class="read-item"><p>${i + 1}. ${q.q}</p>
+        <div class="read-opts">${q.options.map((o, j) =>
+          `<button type="button" class="read-opt" data-i="${i}" data-j="${j}">${String.fromCharCode(65 + j)}. ${o}</button>`
+        ).join('')}</div><div class="read-result hidden"></div></div>`;
+    }).join('');
+
+    $$(`${containerId} .read-opt`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        const qi = +btn.dataset.i, sel = +btn.dataset.j;
+        const q = data.questions[qi];
+        const item = btn.closest('.read-item');
+        item.querySelectorAll('.read-opt').forEach((b, j) => {
+          b.disabled = true;
+          b.classList.toggle('correct', j === q.answer);
+          b.classList.toggle('wrong', j === sel && sel !== q.answer);
+        });
+        const r = item.querySelector('.read-result');
+        r.className = 'read-result ' + (sel === q.answer ? 'success' : 'error');
+        r.textContent = q.explain || (sel === q.answer ? '✓' : '✗');
+      });
+    });
+
+    $$(`${containerId} .tf-btn`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        const qi = +btn.dataset.i;
+        const sel = btn.dataset.v === 'true';
+        const q = data.questions[qi];
+        const item = btn.closest('.read-item');
+        item.querySelectorAll('.tf-btn').forEach(b => {
+          b.disabled = true;
+          b.classList.toggle('correct', (b.dataset.v === 'true') === q.answer);
+        });
+        const r = item.querySelector('.read-result');
+        r.className = 'read-result ' + (sel === q.answer ? 'success' : 'error');
+        r.textContent = sel === q.answer ? '✓' : '✗';
+      });
+    });
+
+    data.questions.forEach((q, i) => {
+      if (q.type !== 'fill') return;
+      const input = $(`#${prefix}Fill${i}`);
+      const result = $(`#${prefix}FillResult${i}`);
+      if (!input || !result) return;
+      input.addEventListener('change', () => {
+        const val = norm(input.value);
+        const ok = (q.accept || [q.answer]).some(a => norm(a) === val);
+        result.className = 'read-result ' + (ok ? 'success' : 'error');
+        result.classList.remove('hidden');
+        result.textContent = ok ? '✓' : `✗ ${q.answer}`;
+      });
+    });
+  }
+
+  function renderEngPlayPick() {
+    if (typeof ENG_PAPER_PICKS === 'undefined' || !window.renderPaperPicks) return;
+    window.renderPaperPicks({
+      listId: '#engPlayPick',
+      pagerId: '#engPlayPickPager',
+      picks: ENG_PAPER_PICKS,
+      pageSize: 10,
+      key: 'eng-pick'
     });
   }
 
@@ -448,46 +571,15 @@
   }
 
   function renderEngPlayReading() {
-    $('#engPlayMyopiaPassage').textContent = ENG_READING_MYOPIA.passage;
+    renderReadingBlock('#engPlayMyopiaQ', ENG_READING_MYOPIA, 'myopia');
+    if (typeof ENG_READING_METRO !== 'undefined') {
+      renderReadingBlock('#engPlayMetroQ', ENG_READING_METRO, 'metro');
+    }
+    if (typeof ENG_READING_TRANSPORT !== 'undefined') {
+      renderReadingBlock('#engPlayTransportQ', ENG_READING_TRANSPORT, 'transport');
+    }
+
     $('#engPlayTeaPassage').textContent = ENG_READING_TEA.passage;
-
-    $('#engPlayMyopiaQ').innerHTML = ENG_READING_MYOPIA.questions.map((q, i) => {
-      if (q.type === 'fill') {
-        return `<div class="read-item"><p>${i + 1}. ${q.q}</p>
-          <input type="text" class="read-input" id="myopiaFill">
-          <div class="read-result hidden" id="myopiaFillResult"></div></div>`;
-      }
-      return `<div class="read-item"><p>${i + 1}. ${q.q}</p>
-        <div class="read-opts">${q.options.map((o, j) =>
-          `<button type="button" class="read-opt" data-i="${i}" data-j="${j}">${String.fromCharCode(65 + j)}. ${o}</button>`
-        ).join('')}</div><div class="read-result hidden"></div></div>`;
-    }).join('');
-
-    $$('#engPlayMyopiaQ .read-opt').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const qi = +btn.dataset.i, sel = +btn.dataset.j;
-        const q = ENG_READING_MYOPIA.questions[qi];
-        const item = btn.closest('.read-item');
-        item.querySelectorAll('.read-opt').forEach((b, j) => {
-          b.disabled = true;
-          b.classList.toggle('correct', j === q.answer);
-          b.classList.toggle('wrong', +b.dataset.j === sel && sel !== q.answer);
-        });
-        const r = item.querySelector('.read-result');
-        r.className = 'read-result ' + (sel === q.answer ? 'success' : 'error');
-        r.textContent = q.explain || (sel === q.answer ? '✓' : '✗');
-      });
-    });
-
-    $('#checkMyopiaFillBtn').onclick = () => {
-      const q = ENG_READING_MYOPIA.questions.find(x => x.type === 'fill');
-      const val = norm($('#myopiaFill').value);
-      const ok = q.accept.some(a => norm(a) === val);
-      const r = $('#myopiaFillResult');
-      r.className = 'read-result ' + (ok ? 'success' : 'error');
-      r.textContent = ok ? '✓ two hours' : '✗ two hours';
-    };
-
     $('#engPlayTeaQ').innerHTML = ENG_READING_TEA.questions.map((q, i) => `
       <div class="read-item"><p>${i + 1}. ${q.q}</p>
         <div class="tf-btns">
@@ -519,6 +611,143 @@
       `<div class="writing-example"><p>${e.sentence}</p></div>`).join('');
   }
 
+  /* ── 听力练习 ── */
+  function stopEngListening() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    engState.listenPlaying = false;
+    const status = $('#engListenStatus');
+    if (status) status.textContent = '';
+    const playBtn = $('#engListenPlay');
+    if (playBtn) playBtn.disabled = false;
+  }
+
+  function getEngListenVoice() {
+    if (!window.speechSynthesis) return null;
+    const voices = speechSynthesis.getVoices();
+    return voices.find(v => /en-US|en-GB|English/i.test(v.lang + v.name)) || voices[0] || null;
+  }
+
+  function playEngListeningLines(lines, onDone) {
+    if (!window.speechSynthesis) {
+      alert('当前浏览器不支持语音朗读，请使用 Chrome 或 Edge。');
+      onDone?.();
+      return;
+    }
+    stopEngListening();
+    engState.listenPlaying = true;
+    $('#engListenPlay').disabled = true;
+    $('#engListenStatus').textContent = '正在播放…';
+
+    let i = 0;
+    const voice = getEngListenVoice();
+
+    function speakNext() {
+      if (i >= lines.length) {
+        engState.listenPlaying = false;
+        $('#engListenPlay').disabled = false;
+        $('#engListenStatus').textContent = '播放完毕，请答题';
+        onDone?.();
+        return;
+      }
+      const line = lines[i++];
+      const u = new SpeechSynthesisUtterance(line.text);
+      u.lang = 'en-US';
+      u.rate = 0.88;
+      if (voice) u.voice = voice;
+      u.onend = () => setTimeout(speakNext, line.speaker ? 700 : 500);
+      u.onerror = () => setTimeout(speakNext, 300);
+      speechSynthesis.speak(u);
+    }
+
+    if (speechSynthesis.getVoices().length === 0) {
+      speechSynthesis.onvoiceschanged = () => {
+        speechSynthesis.onvoiceschanged = null;
+        speakNext();
+      };
+    } else {
+      speakNext();
+    }
+  }
+
+  function renderEngListening() {
+    if (typeof ENG_LISTENING === 'undefined' || !ENG_LISTENING.length) return;
+    const item = ENG_LISTENING[engState.listenIndex];
+    $('#engListenTitle').textContent = item.title;
+    $('#engListenTag').textContent = item.tag;
+    $('#engListenCounter').textContent = `${engState.listenIndex + 1} / ${ENG_LISTENING.length}`;
+    $('#engListenSelect').value = String(engState.listenIndex);
+
+    $('#engListenScript').innerHTML = item.lines.map(line =>
+      line.speaker
+        ? `<p><strong>${line.speaker}:</strong> ${line.text}</p>`
+        : `<p>${line.text}</p>`
+    ).join('');
+
+    $('#engListenQuestions').innerHTML = `
+      <h3 class="play-card-title">根据听力选择正确答案</h3>
+      ${item.questions.map((q, qi) => `
+        <div class="listen-item" data-qi="${qi}">
+          <p class="listen-q">${qi + 1}. ${q.q}</p>
+          <div class="listen-opts">
+            ${q.options.map((o, j) =>
+              `<button type="button" class="listen-opt" data-qi="${qi}" data-j="${j}">${String.fromCharCode(65 + j)}. ${o}</button>`
+            ).join('')}
+          </div>
+          <div class="listen-result hidden"></div>
+        </div>`).join('')}`;
+
+    $$('#engListenQuestions .listen-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const qi = +btn.dataset.qi;
+        const sel = +btn.dataset.j;
+        const q = item.questions[qi];
+        const box = btn.closest('.listen-item');
+        box.querySelectorAll('.listen-opt').forEach((b, j) => {
+          b.disabled = true;
+          b.classList.toggle('correct', j === q.answer);
+          b.classList.toggle('wrong', j === sel && sel !== q.answer);
+        });
+        const r = box.querySelector('.listen-result');
+        r.classList.remove('hidden');
+        r.className = 'listen-result ' + (sel === q.answer ? 'success' : 'error');
+        r.textContent = sel === q.answer ? '✓ ' + q.explain : '✗ 正确答案：' + String.fromCharCode(65 + q.answer) + '. ' + q.explain;
+      });
+    });
+
+    stopEngListening();
+  }
+
+  function initEngListening() {
+    if (typeof ENG_LISTENING === 'undefined') return;
+    const sel = $('#engListenSelect');
+    sel.innerHTML = ENG_LISTENING.map((item, i) =>
+      `<option value="${i}">${item.title}</option>`).join('');
+    sel.addEventListener('change', () => {
+      engState.listenIndex = +sel.value;
+      renderEngListening();
+    });
+    $('#engListenPlay').addEventListener('click', () => {
+      const item = ENG_LISTENING[engState.listenIndex];
+      playEngListeningLines(item.lines);
+    });
+    $('#engListenReplay').addEventListener('click', () => {
+      const item = ENG_LISTENING[engState.listenIndex];
+      playEngListeningLines(item.lines);
+    });
+    $('#engListenPrev').addEventListener('click', () => {
+      engState.listenIndex = (engState.listenIndex - 1 + ENG_LISTENING.length) % ENG_LISTENING.length;
+      renderEngListening();
+    });
+    $('#engListenNext').addEventListener('click', () => {
+      engState.listenIndex = (engState.listenIndex + 1) % ENG_LISTENING.length;
+      renderEngListening();
+    });
+    renderEngListening();
+  }
+
+  window.renderEngListening = renderEngListening;
+  window.stopEngListening = stopEngListening;
+
   function initEnglish() {
     loadEngProgress();
     renderEngHome();
@@ -533,6 +762,8 @@
     renderEngDialogue();
     renderEngPlayReading();
     renderEngPlayWriting();
+    renderEngPlayPick();
+    initEngListening();
     updateEngProgressUI();
   }
 

@@ -48,6 +48,8 @@
     const viewEl = $(`#view-${view}`);
     if (viewEl) viewEl.classList.add('active');
     $$(`.nav-btn[data-view="${view}"]`).forEach(b => b.classList.add('active'));
+    if (view === 'eng-listening' && window.renderEngListening) window.renderEngListening();
+    if (view !== 'eng-listening' && window.stopEngListening) window.stopEngListening();
   }
 
   /* ── Subject switcher ── */
@@ -75,12 +77,12 @@
     } else if (subject === 'english') {
       $('#logoIcon').textContent = '📘';
       $('#siteTitle').textContent = '五年级下册英语';
-      $('#siteSubtitle').textContent = '南京卷期末模拟 · 笔试练习';
+      $('#siteSubtitle').textContent = '译林五下教材 + 南京卷 · 互动复习';
       switchView('eng-home');
     } else if (subject === 'math') {
       $('#logoIcon').textContent = '📐';
       $('#siteTitle').textContent = '五年级下册数学';
-      $('#siteSubtitle').textContent = '苏州期末卷 · 苏教版互动复习';
+      $('#siteSubtitle').textContent = '苏教五下教材 + 苏州期末卷';
       switchView('math-home');
     } else if (subject === 'chinese') {
       $('#logoIcon').textContent = '📖';
@@ -651,6 +653,86 @@
     $('#conceptFeedback').textContent = msg;
     $('#conceptNext').classList.add('hidden');
   }
+
+  /* ── 卷面精选分页（语文 / 数学 / 英语共用） ── */
+  const pickPagerState = {};
+
+  function renderPaperPicks(opts) {
+    const { listId, pagerId, picks, pageSize = 10, key } = opts;
+    if (!picks || !picks.length) return;
+
+    const listEl = $(listId);
+    const pagerEl = pagerId ? $(pagerId) : null;
+    if (!listEl) return;
+
+    const stateKey = key || listId;
+    if (!pickPagerState[stateKey]) pickPagerState[stateKey] = { page: 0 };
+    const st = pickPagerState[stateKey];
+
+    const total = picks.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (st.page >= totalPages) st.page = totalPages - 1;
+    if (st.page < 0) st.page = 0;
+
+    const start = st.page * pageSize;
+    const slice = picks.slice(start, start + pageSize);
+
+    listEl.innerHTML = slice.map((item, i) => {
+      const idx = start + i;
+      return `
+      <div class="read-item pick-item" data-id="${item.id}">
+        <span class="paper-tag">${item.paper}</span>
+        <p>${idx + 1}. ${item.q}</p>
+        <div class="read-opts">
+          ${item.options.map((o, j) =>
+            `<button type="button" class="read-opt pick-opt" data-i="${idx}" data-j="${j}">${String.fromCharCode(65 + j)}. ${o}</button>`
+          ).join('')}
+        </div>
+        <div class="read-result hidden"></div>
+      </div>`;
+    }).join('');
+
+    listEl.querySelectorAll('.pick-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const qi = +btn.dataset.i;
+        const sel = +btn.dataset.j;
+        const q = picks[qi];
+        const item = btn.closest('.pick-item');
+        item.querySelectorAll('.pick-opt').forEach((b, j) => {
+          b.disabled = true;
+          b.classList.toggle('correct', j === q.answer);
+          b.classList.toggle('wrong', j === sel && sel !== q.answer);
+        });
+        const r = item.querySelector('.read-result');
+        r.classList.remove('hidden');
+        r.className = 'read-result ' + (sel === q.answer ? 'success' : 'error');
+        r.textContent = (sel === q.answer ? '✓ ' : '✗ ') + q.explain;
+      });
+    });
+
+    if (!pagerEl) return;
+
+    const from = start + 1;
+    const to = Math.min(start + pageSize, total);
+    pagerEl.innerHTML = `
+      <div class="pick-pager">
+        <button type="button" class="btn btn-secondary pick-page-btn" data-dir="prev"${st.page === 0 ? ' disabled' : ''}>← 上一页</button>
+        <span class="pick-page-info">第 ${st.page + 1} / ${totalPages} 页 · ${from}–${to} / ${total} 题</span>
+        <button type="button" class="btn btn-secondary pick-page-btn" data-dir="next"${st.page >= totalPages - 1 ? ' disabled' : ''}>下一页 →</button>
+      </div>`;
+
+    pagerEl.querySelectorAll('.pick-page-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        if (btn.dataset.dir === 'prev') st.page--;
+        else st.page++;
+        renderPaperPicks(opts);
+        pagerEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+  }
+
+  window.renderPaperPicks = renderPaperPicks;
 
   /* ── Play tabs ── */
   function initPlayTabs() {

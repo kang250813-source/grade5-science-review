@@ -38,6 +38,7 @@
           <button class="nav-btn" data-subject="english" data-view="eng-learn">知识点</button>
           <button class="nav-btn" data-subject="english" data-view="eng-flashcard">闪卡</button>
           <button class="nav-btn" data-subject="english" data-view="eng-quiz">测验</button>
+          <button class="nav-btn" data-subject="english" data-view="eng-listening">听力</button>
           <button class="nav-btn" data-subject="english" data-view="eng-play">趣味互动</button>
         </nav>
 
@@ -213,6 +214,12 @@
         </div>
         <div class="unit-grid" id="engUnitGrid"></div>
         <div class="stats-row" id="engStatsRow"></div>
+        <div class="eng-exam-sections" id="engExamSections"></div>
+        <div class="eng-sources-block">
+          <h3 class="section-title eng-section-title">📚 参考试卷（亮点给力 + 南京卷）</h3>
+          <div class="eng-sources-grid" id="engSourcesGrid"></div>
+        </div>
+        <div class="eng-mistakes-block" id="engMistakesBlock"></div>
       </section>
 
       <section class="view" id="view-eng-learn" data-subject="english">
@@ -252,6 +259,7 @@
       <section class="view" id="view-eng-quiz" data-subject="english">
         <div id="engQuizSetup" class="quiz-setup">
           <h2>选择测验范围</h2>
+          <p class="quiz-hint">含南京期末卷 + 亮点给力大试卷：选择、填空、语法（每次 15 题）</p>
           <div class="quiz-options" id="engQuizOptions"></div>
           <button class="btn btn-primary btn-lg" id="startEngQuiz">开始测验</button>
         </div>
@@ -279,11 +287,38 @@
         </div>
       </section>
 
+      <section class="view" id="view-eng-listening" data-subject="english">
+        <div class="listening-header">
+          <select id="engListenSelect" class="select"></select>
+          <span class="listening-tag" id="engListenTag">听对话选答</span>
+          <span class="listening-counter" id="engListenCounter">1 / 7</span>
+        </div>
+        <div class="listening-player play-card">
+          <h3 class="play-card-title" id="engListenTitle">Unit 2 · 交通方式</h3>
+          <p class="listening-hint">点击「播放听力」认真听，再作答。电脑/平板建议用 Chrome 浏览器，朗读更自然。</p>
+          <div class="listening-controls">
+            <button type="button" class="btn btn-primary btn-lg" id="engListenPlay">🔊 播放听力</button>
+            <button type="button" class="btn btn-secondary" id="engListenReplay">🔁 再听一遍</button>
+            <span class="listening-status" id="engListenStatus"></span>
+          </div>
+          <details class="listening-transcript">
+            <summary>显示听力原文（建议先听完再看）</summary>
+            <div class="listening-script" id="engListenScript"></div>
+          </details>
+        </div>
+        <div class="listening-questions play-card" id="engListenQuestions"></div>
+        <div class="listening-nav">
+          <button type="button" class="btn btn-secondary" id="engListenPrev">← 上一套</button>
+          <button type="button" class="btn btn-secondary" id="engListenNext">下一套 →</button>
+        </div>
+      </section>
+
       <section class="view" id="view-eng-play" data-subject="english">
         <div class="play-tabs">
           <button class="play-tab active" data-play="vocab">📝 词汇闯关</button>
           <button class="play-tab" data-play="dialogue">💬 对话填空</button>
           <button class="play-tab" data-play="reading">📖 阅读练习</button>
+          <button class="play-tab" data-play="pick">📄 卷面精选</button>
           <button class="play-tab" data-play="writing">✍️ 写作参考</button>
         </div>
 
@@ -310,16 +345,33 @@
           <div class="play-tabs read-tabs" style="margin-bottom:1rem">
             <button type="button" class="read-tab play-tab active" data-read="myopia">👓 近视</button>
             <button type="button" class="read-tab play-tab" data-read="tea">🍵 茶文化</button>
+            <button type="button" class="read-tab play-tab" data-read="metro">🚇 重庆地铁</button>
+            <button type="button" class="read-tab play-tab" data-read="transport">🌍 世界交通</button>
           </div>
           <div class="read-panel active" id="read-play-myopia">
             <pre class="read-passage" id="engPlayMyopiaPassage"></pre>
             <div id="engPlayMyopiaQ"></div>
-            <button type="button" class="btn btn-secondary" id="checkMyopiaFillBtn">检查填空题</button>
           </div>
           <div class="read-panel" id="read-play-tea">
             <pre class="read-passage" id="engPlayTeaPassage"></pre>
             <p class="play-card-desc">T = 正确，F = 错误</p>
             <div id="engPlayTeaQ"></div>
+          </div>
+          <div class="read-panel" id="read-play-metro">
+            <pre class="read-passage" id="engPlayMetroPassage"></pre>
+            <div id="engPlayMetroQ"></div>
+          </div>
+          <div class="read-panel" id="read-play-transport">
+            <pre class="read-passage" id="engPlayTransportPassage"></pre>
+            <div id="engPlayTransportQ"></div>
+          </div>
+        </div>
+
+        <div class="play-panel" id="eng-play-pick">
+          <div class="play-card">
+            <p class="play-card-desc">36 道典型选择题：语法、固定搭配、课文细节（来自亮点给力 + 南京卷）</p>
+            <div id="engPlayPickPager" class="pick-pager-wrap"></div>
+            <div id="engPlayPick"></div>
           </div>
         </div>
 
@@ -374,7 +426,7 @@
                 <p class="flash-hint">点击卡片查看答案</p>
               </div>
               <div class="flashcard-back">
-                <p id="mathFlashAnswer">答案</p>
+                <div id="mathFlashAnswer" class="flash-answer-body"><p class="flash-answer-text">答案</p></div>
               </div>
             </div>
           </div>
@@ -457,6 +509,7 @@
         <div class="play-panel" id="math-play-pick">
           <div class="play-card">
             <p class="play-card-desc">48 道典型选择题：因数倍数、分数、圆、方程、统计、综合应用</p>
+            <div id="mathPlayPickPager" class="pick-pager-wrap"></div>
             <div id="mathPlayPick"></div>
           </div>
         </div>
@@ -583,6 +636,7 @@
         <div class="play-panel" id="chi-play-pick">
           <div class="play-card">
             <p class="play-card-desc">48 道典型选择题：课文理解、阅读方法、习作要点（来自 21 份苏州卷）</p>
+            <div id="chiPlayPickPager" class="pick-pager-wrap"></div>
             <div id="chiPlayPick"></div>
           </div>
         </div>
@@ -597,12 +651,25 @@
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
   <script src="js/english-data.js"></script>
+  <script src="js/english-papers.js"></script>
+  <script src="js/english-points-expansion.js"></script>
+  <script src="js/english-textbook.js"></script>
+  <script src="js/english-textbook-expansion.js"></script>
+  <script src="js/english-flashcards-expansion.js"></script>
+  <script src="js/english-listening.js"></script>
   <script src="js/english-app.js"></script>
   <script src="js/math-data.js"></script>
   <script src="js/math-papers.js"></script>
+  <script src="js/math-points-expansion.js"></script>
+  <script src="js/math-textbook.js"></script>
+  <script src="js/math-flash-viz.js"></script>
+  <script src="js/math-flashcards-expansion.js"></script>
   <script src="js/math-app.js"></script>
   <script src="js/chinese-data.js"></script>
   <script src="js/chinese-papers.js"></script>
+  <script src="js/chinese-points-expansion.js"></script>
+  <script src="js/chinese-textbook.js"></script>
+  <script src="js/chinese-flashcards-expansion.js"></script>
   <script src="js/chinese-app.js"></script>
 </body>
 </html>
