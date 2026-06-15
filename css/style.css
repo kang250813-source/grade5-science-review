@@ -50,15 +50,309 @@ body {
   max-width: 1100px;
   margin: 0 auto;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.85rem;
 }
 
-.logo { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.header-top-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.header-context {
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: rgba(255,255,255,0.18);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.portal-back {
+  font-family: var(--font);
+  border: 1px solid rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.15);
+  color: white;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.portal-back:hover { background: rgba(255,255,255,0.28); }
+
+.header-study {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.logo { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; cursor: pointer; }
 .logo-icon { font-size: 2rem; }
 .logo h1 { font-size: 1.25rem; font-weight: 900; line-height: 1.2; }
 .logo p { font-size: 0.75rem; opacity: 0.85; }
+
+/* Portal home */
+.portal-hero {
+  text-align: center;
+  padding: 2rem 1rem 1.5rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.portal-eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+.portal-title {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.portal-lead {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.portal-grade-badge {
+  display: inline-block;
+  margin-top: 1rem;
+  background: var(--grade-badge-bg, linear-gradient(135deg, #dbeafe, #ede9fe));
+  color: var(--grade-badge-color, #1d4ed8);
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+.portal-grade-row {
+  max-width: 720px;
+  margin: 0 auto 1.5rem;
+  padding: 0 1rem;
+}
+.portal-section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 0.65rem;
+  text-align: center;
+}
+.portal-grade-pills {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.portal-grade-pill {
+  font-family: var(--font);
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: var(--text);
+  min-width: 4.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  box-shadow: var(--shadow);
+}
+.portal-grade-pill:hover { border-color: #93c5fd; transform: translateY(-2px); }
+.portal-grade-pill.active {
+  border-color: var(--primary);
+  background: linear-gradient(180deg, #eff6ff, #fff);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.18);
+}
+.portal-grade-pill.soon { opacity: 0.72; }
+.portal-grade-num { font-size: 1.35rem; font-weight: 900; line-height: 1; color: var(--primary); }
+.portal-grade-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
+.portal-grade-tag { font-size: 0.6rem; color: var(--warning); font-weight: 700; }
+.portal-grade-tag.open { color: var(--success); }
+
+.portal-subjects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  max-width: 960px;
+  margin: 0 auto 2.5rem;
+  padding: 0 1rem;
+}
+.portal-subjects.portal-loading {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+#view-portal-home {
+  min-height: calc(100vh - 140px);
+  padding-bottom: 2.5rem;
+  transition: background 0.35s ease;
+}
+
+.portal-subject-card {
+  font-family: var(--font);
+  text-align: left;
+  border: none;
+  background: var(--grade-card-bg, white);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.25rem 1rem;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.35s ease;
+  border-top: 4px solid var(--card-accent, var(--primary));
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.portal-subject-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.portal-subject-card.soon {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+.portal-subject-card.soon:hover {
+  transform: none;
+  box-shadow: var(--shadow);
+}
+.portal-subject-icon { font-size: 2rem; }
+.portal-subject-card h3 { font-size: 1.25rem; font-weight: 900; color: var(--text); }
+.portal-subject-ver { font-size: 0.82rem; font-weight: 700; color: var(--card-accent, var(--primary)); }
+.portal-subject-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; flex: 1; }
+.portal-subject-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+.portal-subject-stats span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--grade-stat-bg, #f1f5f9);
+  color: var(--text-muted);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  transition: background 0.35s ease;
+}
+.portal-subject-go {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--card-accent, var(--primary));
+}
+
+.portal-unavailable {
+  max-width: 420px;
+  margin: 1rem auto 3rem;
+  padding: 2rem 1.5rem;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.portal-unavailable-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.portal-unavailable h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+.portal-unavailable p { color: var(--text-muted); font-size: 0.9rem; }
+
+/* 各年级门户主题色 · 一眼区分当前年级 */
+body.portal-grade-1 {
+  --grade-page-bg: linear-gradient(180deg, #fff1f2 0%, #fce7f3 38%, var(--bg) 88%);
+  --grade-card-bg: linear-gradient(155deg, #ffffff 0%, #ffe4e6 52%, #fecdd3 100%);
+  --grade-badge-bg: linear-gradient(135deg, #fecdd3, #fda4af);
+  --grade-badge-color: #9f1239;
+  --grade-stat-bg: #ffe4e6;
+  --grade-pill-accent: #f43f5e;
+  --grade-unit-card-bg: linear-gradient(160deg, #ffffff 0%, #ffe4e6 100%);
+}
+body.portal-grade-2 {
+  --grade-page-bg: linear-gradient(180deg, #fff7ed 0%, #ffedd5 38%, var(--bg) 88%);
+  --grade-card-bg: linear-gradient(155deg, #ffffff 0%, #ffedd5 52%, #fed7aa 100%);
+  --grade-badge-bg: linear-gradient(135deg, #fed7aa, #fdba74);
+  --grade-badge-color: #9a3412;
+  --grade-stat-bg: #ffedd5;
+  --grade-pill-accent: #ea580c;
+  --grade-unit-card-bg: linear-gradient(160deg, #ffffff 0%, #ffedd5 100%);
+}
+body.portal-grade-3 {
+  --grade-page-bg: linear-gradient(180deg, #fefce8 0%, #fef9c3 38%, var(--bg) 88%);
+  --grade-card-bg: linear-gradient(155deg, #ffffff 0%, #fef9c3 52%, #fde047 100%);
+  --grade-badge-bg: linear-gradient(135deg, #fde68a, #facc15);
+  --grade-badge-color: #854d0e;
+  --grade-stat-bg: #fef9c3;
+  --grade-pill-accent: #ca8a04;
+  --grade-unit-card-bg: linear-gradient(160deg, #ffffff 0%, #fef9c3 100%);
+}
+body.portal-grade-4 {
+  --grade-page-bg: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 38%, var(--bg) 88%);
+  --grade-card-bg: linear-gradient(155deg, #ffffff 0%, #d1fae5 52%, #6ee7b7 100%);
+  --grade-badge-bg: linear-gradient(135deg, #a7f3d0, #34d399);
+  --grade-badge-color: #065f46;
+  --grade-stat-bg: #d1fae5;
+  --grade-pill-accent: #059669;
+  --grade-unit-card-bg: linear-gradient(160deg, #ffffff 0%, #d1fae5 100%);
+}
+body.portal-grade-5 {
+  --grade-page-bg: linear-gradient(180deg, #eff6ff 0%, #dbeafe 38%, var(--bg) 88%);
+  --grade-card-bg: linear-gradient(155deg, #ffffff 0%, #dbeafe 52%, #93c5fd 100%);
+  --grade-badge-bg: linear-gradient(135deg, #bfdbfe, #60a5fa);
+  --grade-badge-color: #1e40af;
+  --grade-stat-bg: #dbeafe;
+  --grade-pill-accent: #2563eb;
+  --grade-unit-card-bg: linear-gradient(160deg, #ffffff 0%, #dbeafe 100%);
+}
+body.portal-grade-6 {
+  --grade-page-bg: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 38%, var(--bg) 88%);
+  --grade-card-bg: linear-gradient(155deg, #ffffff 0%, #ede9fe 52%, #c4b5fd 100%);
+  --grade-badge-bg: linear-gradient(135deg, #ddd6fe, #a78bfa);
+  --grade-badge-color: #5b21b6;
+  --grade-stat-bg: #ede9fe;
+  --grade-pill-accent: #7c3aed;
+  --grade-unit-card-bg: linear-gradient(160deg, #ffffff 0%, #ede9fe 100%);
+}
+
+body[class*="portal-grade-"] #view-portal-home {
+  background: var(--grade-page-bg);
+}
+
+body[class*="portal-grade-"] .portal-unavailable {
+  background: var(--grade-card-bg, white);
+}
+
+body[class*="portal-grade-"] .portal-grade-pill.active {
+  border-color: var(--grade-pill-accent);
+  background: linear-gradient(180deg, var(--grade-stat-bg), #fff);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--grade-pill-accent) 28%, transparent);
+}
+
+body[class*="portal-grade-"] .portal-grade-pill.active .portal-grade-num {
+  color: var(--grade-pill-accent);
+}
+
+body[class*="portal-grade-"] .unit-card {
+  background: var(--grade-unit-card-bg, white);
+}
+
+body.study-mode .header { padding-bottom: 0.85rem; }
 
 .subject-bar {
   display: flex;
@@ -413,12 +707,12 @@ body {
 }
 
 .unit-card {
-  background: var(--surface);
+  background: var(--grade-unit-card-bg, var(--surface));
   border-radius: var(--radius);
   padding: 1.5rem;
   box-shadow: var(--shadow);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.35s ease;
   border-top: 4px solid;
   position: relative;
   overflow: hidden;

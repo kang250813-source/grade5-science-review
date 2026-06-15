@@ -1,7 +1,15 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'chinese-review-progress';
+  const SUBJECT = 'chinese';
+
+  function progressStore() {
+    const g = GradeRegistry.getActiveGrade();
+    return {
+      load: () => GradeProgress.load(g, SUBJECT),
+      save: data => GradeProgress.save(g, SUBJECT, data)
+    };
+  }
 
   let chiState = {
     completedTopics: [],
@@ -44,7 +52,7 @@
 
   function loadChiProgress() {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      const saved = progressStore().load();
       if (saved) {
         chiState.completedTopics = saved.completedTopics || [];
         chiState.knownFlashcards = saved.knownFlashcards || [];
@@ -53,21 +61,33 @@
   }
 
   function saveChiProgress() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    progressStore().save({
       completedTopics: chiState.completedTopics,
       knownFlashcards: chiState.knownFlashcards
-    }));
+    });
     updateChiProgressUI();
   }
 
   function updateChiProgressUI() {
-    const total = getChnAllTopicIds().length;
+    const total = chnAllTopicIds().length;
     const done = chiState.completedTopics.length;
     const pct = total ? Math.round((done / total) * 100) : 0;
     const fill = $('#chiProgressFill');
     const text = $('#chiProgressText');
     if (fill) fill.style.width = pct + '%';
     if (text) text.textContent = pct + '%';
+  }
+
+  function chnAllTopicIds() {
+    if (typeof getChnAllTopicIds === 'function') return getChnAllTopicIds();
+    if (typeof CHN_UNITS === 'undefined') return [];
+    return CHN_UNITS.flatMap(u => u.topics.map(t => t.id));
+  }
+
+  function chnTotalPoints() {
+    if (typeof getChnTotalPoints === 'function') return getChnTotalPoints();
+    if (typeof CHN_UNITS === 'undefined') return 0;
+    return CHN_UNITS.reduce((n, u) => n + u.topics.reduce((m, t) => m + t.points.length, 0), 0);
   }
 
   function renderBlankInputs(text) {
@@ -110,8 +130,8 @@
 
     $('#chiStatsRow').innerHTML = `
       <div class="stat-card"><div class="stat-num">${CHN_UNITS.length}</div><div class="stat-label">单元</div></div>
-      <div class="stat-card"><div class="stat-num">${getChnAllTopicIds().length}</div><div class="stat-label">知识点</div></div>
-      <div class="stat-card"><div class="stat-num">${getChnTotalPoints()}</div><div class="stat-label">要点</div></div>
+      <div class="stat-card"><div class="stat-num">${chnAllTopicIds().length}</div><div class="stat-label">知识点</div></div>
+      <div class="stat-card"><div class="stat-num">${chnTotalPoints()}</div><div class="stat-label">要点</div></div>
       <div class="stat-card"><div class="stat-num">${typeof CHN_SOURCES !== 'undefined' ? CHN_SOURCES.length : 12}</div><div class="stat-label">参考试卷</div></div>`;
 
     if (typeof CHN_EXAM_SECTIONS !== 'undefined') {
@@ -208,15 +228,24 @@
   }
 
   /* ── 闪卡 ── */
+  let chiFlashSelectBound = false;
+  let chiFlashControlsBound = false;
+
   function initChiFlashSelect() {
     const sel = $('#chiFlashUnitSelect');
     sel.innerHTML = '<option value="all">全部单元</option>' +
       CHN_UNITS.map((u, i) => `<option value="${i}">第${i + 1}单元</option>`).join('');
-    sel.addEventListener('change', () => {
-      chiState.flashUnit = sel.value;
-      chiState.flashIndex = 0;
-      renderChiFlashcard();
-    });
+    chiState.flashUnit = 'all';
+    chiState.flashIndex = 0;
+    sel.value = 'all';
+    if (!chiFlashSelectBound) {
+      chiFlashSelectBound = true;
+      sel.addEventListener('change', () => {
+        chiState.flashUnit = sel.value;
+        chiState.flashIndex = 0;
+        renderChiFlashcard();
+      });
+    }
   }
 
   function getFilteredChiFlash() {
@@ -226,17 +255,28 @@
 
   function renderChiFlashcard() {
     const cards = getFilteredChiFlash();
-    if (!cards.length) return;
+    const cardEl = $('#chiFlashcard');
+    if (!cards.length) {
+      cardEl.classList.remove('flipped');
+      $('#chiFlashTag').textContent = '暂无闪卡';
+      $('#chiFlashQuestion').textContent = '该单元暂无闪卡，请切换单元或返回知识点学习';
+      $('#chiFlashAnswer').textContent = '—';
+      $('#chiFlashCounter').textContent = '0 / 0';
+      return;
+    }
     if (chiState.flashIndex >= cards.length) chiState.flashIndex = 0;
     const card = cards[chiState.flashIndex];
-    $('#chiFlashcard').classList.remove('flipped');
-    $('#chiFlashTag').textContent = CHN_UNITS[card.unit].title;
+    cardEl.classList.remove('flipped');
+    const unitTitle = CHN_UNITS[card.unit] ? CHN_UNITS[card.unit].title : `第${card.unit + 1}单元`;
+    $('#chiFlashTag').textContent = unitTitle;
     $('#chiFlashQuestion').textContent = card.q;
     $('#chiFlashAnswer').textContent = card.a;
     $('#chiFlashCounter').textContent = `${chiState.flashIndex + 1} / ${cards.length}`;
   }
 
   function setupChiFlashControls() {
+    if (chiFlashControlsBound) return;
+    chiFlashControlsBound = true;
     $('#chiFlashcard').addEventListener('click', () => {
       $('#chiFlashcard').classList.toggle('flipped');
     });

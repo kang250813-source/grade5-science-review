@@ -1,7 +1,15 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'math-review-progress';
+  const SUBJECT = 'math';
+
+  function progressStore() {
+    const g = GradeRegistry.getActiveGrade();
+    return {
+      load: () => GradeProgress.load(g, SUBJECT),
+      save: data => GradeProgress.save(g, SUBJECT, data)
+    };
+  }
 
   let mathState = {
     completedTopics: [],
@@ -44,7 +52,7 @@
 
   function loadMathProgress() {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      const saved = progressStore().load();
       if (saved) {
         mathState.completedTopics = saved.completedTopics || [];
         mathState.knownFlashcards = saved.knownFlashcards || [];
@@ -53,10 +61,10 @@
   }
 
   function saveMathProgress() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    progressStore().save({
       completedTopics: mathState.completedTopics,
       knownFlashcards: mathState.knownFlashcards
-    }));
+    });
     updateMathProgressUI();
   }
 

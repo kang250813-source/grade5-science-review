@@ -3,7 +3,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 PORT=8899
 cd "$DIR"
 
-if ! python3 -m http.server "$PORT" --bind 127.0.0.1 >/tmp/science-review-server.log 2>&1 & then
+if ! python3 -m http.server "$PORT" --bind 0.0.0.0 >/tmp/science-review-server.log 2>&1 & then
   echo "启动失败，请查看 /tmp/science-review-server.log"
   exit 1
 fi
@@ -11,7 +11,12 @@ SERVER_PID=$!
 sleep 0.5
 
 if kill -0 "$SERVER_PID" 2>/dev/null; then
-  echo "复习网站已启动：http://127.0.0.1:$PORT/"
+  LAN_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+  echo "复习网站已启动："
+  echo "  本机：http://127.0.0.1:$PORT/"
+  if [ -n "$LAN_IP" ]; then
+    echo "  手机/平板（同一 WiFi）：http://$LAN_IP:$PORT/"
+  fi
   echo "进程 PID: $SERVER_PID"
   if command -v xdg-open >/dev/null 2>&1; then
     xdg-open "http://127.0.0.1:$PORT/"

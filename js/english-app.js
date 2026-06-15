@@ -1,7 +1,15 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'english-review-progress';
+  const SUBJECT = 'english';
+
+  function progressStore() {
+    const g = GradeRegistry.getActiveGrade();
+    return {
+      load: () => GradeProgress.load(g, SUBJECT),
+      save: data => GradeProgress.save(g, SUBJECT, data)
+    };
+  }
 
   let engState = {
     completedTopics: [],
@@ -35,7 +43,7 @@
 
   function loadEngProgress() {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      const saved = progressStore().load();
       if (saved) {
         engState.completedTopics = saved.completedTopics || [];
         engState.knownFlashcards = saved.knownFlashcards || [];
@@ -44,10 +52,10 @@
   }
 
   function saveEngProgress() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    progressStore().save({
       completedTopics: engState.completedTopics,
       knownFlashcards: engState.knownFlashcards
-    }));
+    });
     updateEngProgressUI();
   }
 
@@ -396,12 +404,20 @@
   }
 
   function renderReadingBlock(containerId, data, prefix) {
+    if (!data || !Array.isArray(data.questions)) return;
     $(`${containerId.replace('Q', 'Passage')}`).textContent = data.passage;
     $(containerId).innerHTML = data.questions.map((q, i) => {
       if (q.type === 'fill') {
         return `<div class="read-item"><p>${i + 1}. ${q.q}</p>
           <input type="text" class="read-input" id="${prefix}Fill${i}">
           <div class="read-result hidden" id="${prefix}FillResult${i}"></div></div>`;
+      }
+      if (typeof q.answer === 'boolean') {
+        return `<div class="read-item"><p>${i + 1}. ${q.q}</p>
+          <div class="tf-btns">
+            <button type="button" class="tf-btn" data-i="${i}" data-v="true">T</button>
+            <button type="button" class="tf-btn" data-i="${i}" data-v="false">F</button>
+          </div><div class="read-result hidden"></div></div>`;
       }
       if (q.options && q.options[0] && (q.options[0].startsWith('True') || q.options[0].startsWith('False'))) {
         return `<div class="read-item"><p>${i + 1}. ${q.q}</p>
@@ -410,6 +426,7 @@
             <button type="button" class="tf-btn" data-i="${i}" data-v="false">F</button>
           </div><div class="read-result hidden"></div></div>`;
       }
+      if (!Array.isArray(q.options)) return '';
       return `<div class="read-item"><p>${i + 1}. ${q.q}</p>
         <div class="read-opts">${q.options.map((o, j) =>
           `<button type="button" class="read-opt" data-i="${i}" data-j="${j}">${String.fromCharCode(65 + j)}. ${o}</button>`

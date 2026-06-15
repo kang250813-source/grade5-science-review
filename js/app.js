@@ -1,7 +1,15 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'science-review-progress';
+  const SUBJECT = 'science';
+
+  function progressStore() {
+    const g = GradeRegistry.getActiveGrade();
+    return {
+      load: () => GradeProgress.load(g, SUBJECT),
+      save: data => GradeProgress.save(g, SUBJECT, data)
+    };
+  }
 
   let state = {
     completedTopics: [],
@@ -22,7 +30,7 @@
 
   function loadProgress() {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      const saved = progressStore().load();
       if (saved) {
         state.completedTopics = saved.completedTopics || [];
         state.knownFlashcards = saved.knownFlashcards || [];
@@ -31,10 +39,10 @@
   }
 
   function saveProgress() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    progressStore().save({
       completedTopics: state.completedTopics,
       knownFlashcards: state.knownFlashcards
-    }));
+    });
     updateProgressUI();
   }
 
@@ -52,11 +60,15 @@
     if (view !== 'eng-listening' && window.stopEngListening) window.stopEngListening();
   }
 
+  window.switchView = switchView;
+
   /* ── Subject switcher ── */
   let currentSubject = 'science';
 
   function switchSubject(subject) {
     currentSubject = subject;
+    if (window.Shell) Shell.setCurrentSubject(subject);
+
     $$('.subject-btn').forEach(b => b.classList.toggle('active', b.dataset.subject === subject));
 
     $('#scienceNav').classList.toggle('hidden', subject !== 'science');
@@ -68,33 +80,28 @@
     $('#mathProgress').classList.toggle('hidden', subject !== 'math');
     $('#chineseProgress').classList.toggle('hidden', subject !== 'chinese');
 
+    if (window.Shell && document.body.classList.contains('study-mode')) {
+      Shell.updateHeader(subject);
+    }
+
     if (subject === 'science') {
-      $('#logoIcon').textContent = '🔬';
-      $('#siteTitle').textContent = '五年级下册科学';
-      $('#siteSubtitle').textContent = '教科版 · 互动复习课件';
       const v = state.currentView || 'home';
       switchView(v.startsWith('eng') || v.startsWith('math') || v.startsWith('chi') ? 'home' : v);
     } else if (subject === 'english') {
-      $('#logoIcon').textContent = '📘';
-      $('#siteTitle').textContent = '五年级下册英语';
-      $('#siteSubtitle').textContent = '译林五下教材 + 南京卷 · 互动复习';
       switchView('eng-home');
     } else if (subject === 'math') {
-      $('#logoIcon').textContent = '📐';
-      $('#siteTitle').textContent = '五年级下册数学';
-      $('#siteSubtitle').textContent = '苏教五下教材 + 苏州期末卷';
       switchView('math-home');
     } else if (subject === 'chinese') {
-      $('#logoIcon').textContent = '📖';
-      $('#siteTitle').textContent = '五年级下册语文';
-      $('#siteSubtitle').textContent = '苏州期末卷 · 互动复习';
       switchView('chi-home');
     }
 
     $$('.view').forEach(v => {
+      if (v.id === 'view-portal-home') return;
       if (v.dataset.subject && v.dataset.subject !== subject) v.classList.remove('active');
     });
   }
+
+  window.switchSubject = switchSubject;
 
   window.switchSubjectView = function (subject, view) {
     switchSubject(subject);
@@ -757,27 +764,27 @@
     });
   }
 
-  /* ── Init ── */
-  function init() {
+  function initScience() {
     loadProgress();
-    initSubjectSwitcher();
-    initNav();
-    initLearnSelect();
-    initFlashSelect();
-    setupFlashControls();
-    initQuizSetup();
-    initTimeline();
-    initFoodChain();
-    initConceptQuiz();
-    initPlayTabs();
+    if (!window._scienceUiReady) {
+      initSubjectSwitcher();
+      initNav();
+      initLearnSelect();
+      initFlashSelect();
+      setupFlashControls();
+      initQuizSetup();
+      initTimeline();
+      initFoodChain();
+      initConceptQuiz();
+      initPlayTabs();
+      window._scienceUiReady = true;
+    }
     renderHome();
     renderTopics();
     renderFlashcard();
     updateProgressUI();
-    if (window.initEnglish) window.initEnglish();
-    if (window.initMath) window.initMath();
-    if (window.initChinese) window.initChinese();
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  window.initScience = initScience;
+
 })();
